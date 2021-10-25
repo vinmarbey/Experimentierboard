@@ -1,0 +1,88 @@
+if (modus == 1){
+switch (objekt){
+	case 1:
+		pin output
+		pin high
+	break;
+	case 2:
+	break;
+	case 3:
+	break;
+	case 4:
+	break;
+	case 5:
+	break;
+}
+start_zeitpunkt = millis();
+start_messung = true;
+}
+
+if(modus==2){
+switch (objekt){
+	case 1:
+		pin output
+		pin high
+	break;
+	case 2:
+	break;
+	case 3:
+	break;
+	case 4:
+	break;
+	case 5:
+	break;
+}
+start_zeitpunkt = millis();
+start_messung = true;
+}
+
+
+
+
+im LOOP dann zeit und Wert speichern
+
+if(start_messung == true){	// soll überhaupt gerade gemessen werden
+	akt_time = millis() - start_zeitpunkt;
+	if(akt_time < Messzeit){ // ist die Zeit schon vorbei?
+		delta_time = akt_time-last_time;
+		last_time = akt_time;
+		if(zeitliche_aufloesung < delta_time){ // ist die Zeit zur nächsten messung schon ran?
+			akt_value = Serial.read();
+			2 D Array füllen
+			if(modus == 2){
+				pin.value = (soll_value-akt_value);
+			}
+		}
+	}
+}
+return;
+
+// oder alternativ für seperate Funktion
+if(start_messung != true) return;	// soll überhaupt gerade gemessen werden
+akt_time = millis() - start_zeitpunkt;
+
+if(akt_time > Messzeit) return; // Messzeit ist größer als Messzeitraum
+delta_time = akt_time-last_time;
+last_time = akt_time;
+		
+if(delta_time < zeitliche_aufloesung) return; // die Zeit zur nächsten mesung ist noch nicht dran
+akt_value = Serial.read();
+2 D Array füllen
+
+if(modus != 2) return;
+pin.value = (soll_value-akt_value);
+
+
+
+if (akt_time < Messzeit && modus == 1 && start_messung == true)
+akt_time = millis()-start_zeitpunkt;
+if(akt_timelast_time)
+akt_value = Serial.read();
+2 D Array füllen
+
+if (modus == 2){
+	akt_time = millis()-start_zeitpunkt;
+	akt_value = Serial.read();
+	pin.value = (soll_value-akt_value);
+	2 D Array füllen
+}
