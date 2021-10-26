@@ -72,7 +72,7 @@ const char WEBDATA[] PROGMEM = R"=====(
             <h2>DATA</h2>
             <p>get data and handle it</p>
             <button id="getData" type="button" class="btn">get data</button>
-            <button id="printData" type="button" onclick="printData()" class="btn">print data</button>
+            <button id="printData" type="button" onclick="printData()" class="btn" visible:"false">print data</button>
             <p>gemessene Daten:</p>
             <div id="datacontent"></div>
             
@@ -102,7 +102,7 @@ const char WEBDATA[] PROGMEM = R"=====(
           console.log(value);
           document.getElementById("datacontent").innerHTML = value;
             
-            var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0.5, 3.5, value.length/10+0.5, -0.5], axis:true});
+            var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0.5, 255, value.length/10+0.5, -0.5], axis:true});
             var points = []
             for (let i = 0; i<value.length;i++){
             points[i] = board.create('point',[i/10,value[i]]);

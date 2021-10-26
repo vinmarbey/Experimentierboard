@@ -72,18 +72,20 @@ const char WEBADMIN[] PROGMEM = R"=====(
               <div class="form-group">
                 <p>Messmodus: 1 - Sprungantwort; 2 - Regelung</p>
                 <label>Modus</label>
-                <input id="inputRValue" type="number" min="1" max="2">
+                <input id="inputRValue" type="number" min="1" max="2" value="1">
               </div>
               <div class="form-group">
                 <p>Messobjekte: Hier sind die Objekte 1-5 auswählbar</p>
                 <label>Messobjekte</label>
-                <input id="inputGValue" type="number" min="1" max="5">
+                <input id="inputGValue" type="number" min="1" max="5"  value="1">
               </div>
               <div class="form-group">
-                <label>Messzeitraum</label>
-                <input id="inputBValue" placeholder="0" value="0">
+                <label>Messzeitraum [ms] max: 15000ms</label>
+                <input id="inputBValue" placeholder="0" value="1000">
               </div>
               <button id="submitValues" type="button" class="btn">Start</button>
+              <a href="/data"> go to data</a>
+              
             </form>
     </main>
     

@@ -4,10 +4,9 @@
 #include <ESP8266mDNS.h>
 #include <ArduinoJson.h>
 
-#include "names.h"
+
 #include "web_admin.h"
-#include "web_interface.h"
-#include "web_iro_js.h"
+
 #include "web_jquery_js.h"
 #include "web_popper_js.h"
 #include "web_bootstrap_js.h"
@@ -19,13 +18,24 @@ const char* ssid = "Lord LANdemort";
 const char* password = "79351652776124235782";
 const char* deviceName = "wifi-rgb";
 
-//char Messdaten[];
+unsigned char Messdaten[100];
+unsigned char zaehler_Messdaten=0; 
+char control_messung = 0;
+#define sprung 0
+#define regelung 1
+#define start_messung 2
+char control_messobjekt = 0;
+int control_messzeitspanne;
+unsigned long start_zeitpunkt = 0;
+unsigned long zeitliche_aufloesung = 250;
+unsigned long akt_time, delta_time, last_time = 0;
+int akt_value;
 
 #define BUILTIN_LED 2 // internal ESP-12 LED on GPIO2
 
-#define REDPIN 12
-#define GREENPIN 14
-#define BLUEPIN 5
+#define MESSOBJEKT1 16
+#define MESSOBJEKT2 14
+#define MESSOBJEKT3 5
 
 ESP8266WebServer server(80);
 IPAddress clientIP(192, 168, 2, 250); //the IP of the device
@@ -37,7 +47,19 @@ IPAddress subnet(255, 255, 255, 0); //the subnet mask
 //uint8_t max_connections=8;
 
 
+void resetOutputs() {
+  pinMode(MESSOBJEKT1, OUTPUT);
+  pinMode(MESSOBJEKT2, OUTPUT);
+  pinMode(MESSOBJEKT3, OUTPUT);
 
+  analogWrite(MESSOBJEKT1, 255);
+  analogWrite(MESSOBJEKT2, 255);
+  analogWrite(MESSOBJEKT3, 255);
+
+  analogWrite(MESSOBJEKT1, 0);
+  analogWrite(MESSOBJEKT2, 0);
+  analogWrite(MESSOBJEKT3, 0);
+}
 
 void handleRoot() {
   server.send(200, "text/plain", "hello from esp8266 wifi rgb!");
@@ -59,83 +81,165 @@ void handleNotFound() {
   server.send(404, "text/plain", message);
 }
 
-void Messung(char modus, char messobjekt, int timerange){
-  Serial.println(modus,DEC);
-    Serial.println(messobjekt,DEC);
-    Serial.println(timerange,DEC);
+void starte_Messung(char modus, char messobjekt, int timerange) {
+  if (modus == 1) {
+    control_messung |= (1 << sprung);
+  } else if (modus == 2) {
+    control_messung |= (1 << regelung);
+  } else {
+    control_messung &= ~((1 << sprung) | (1 << regelung));
+    return;
+  }
+  //Serial.println(control_messung, BIN);
+
+  if (messobjekt < 0) { // das Messobjekt gibt es nicht
+    control_messobjekt = 0;
+    return;
+  }
+  control_messobjekt = messobjekt;
+  switch (control_messobjekt) {
+    case 1:
+      pinMode(MESSOBJEKT1, OUTPUT);
+      analogWrite(MESSOBJEKT1, 255);
+      break;
+    default:
+      break;
+  }
+  //Serial.println(control_messobjekt, DEC);
+
+  if (timerange <= 0) {
+    control_messzeitspanne = 0;
+    return;
+  }
+  control_messzeitspanne = timerange;
+  zaehler_Messdaten = 0;
+  for(int i = 0; i < sizeof(Messdaten);i++){
+    Messdaten[i]=0;
+  }
+  control_messung |= (1 << start_messung);
+  start_zeitpunkt = millis();
+  Serial.println("Starte Messung");
+  return;
+}
+
+void stoppe_Messung() {
+  switch (control_messobjekt) {
+    case 1:
+      pinMode(MESSOBJEKT1, OUTPUT);
+      analogWrite(MESSOBJEKT1, 0);
+      break;
+    default:
+      break;
+  }
+  control_messung &= ~((1 << sprung) | (1 << regelung));
+  control_messobjekt = 0;
+  control_messzeitspanne = 0;
+  control_messung &= ~(1 << start_messung);
+
+}
+
+void handleMessung() {
+  
+  if (!(control_messung & (1 << start_messung))) return; // soll überhaupt gerade gemessen werden
+  akt_time = millis() - start_zeitpunkt;
+  //Serial.println(akt_time, DEC);
+
+  if (akt_time > control_messzeitspanne) { // Messzeit ist größer als Messzeitraum
+    stoppe_Messung();
+    Serial.println("Stoppe Messung");
+
+    return;
+  }
+  delta_time = akt_time - last_time;
+  
+
+  if (delta_time < zeitliche_aufloesung) return; // die Zeit zur nächsten mesung ist noch nicht dran
+  //Serial.println(delta_time, DEC);
+  last_time = akt_time;
+  akt_value = analogRead(A0);
+  Serial.println(akt_value, DEC);
+  Messdaten[zaehler_Messdaten] = (unsigned char) akt_value;
+  zaehler_Messdaten ++;
+  
+  //2 D Array füllen
+
+  if (!(control_messung &  (1 << regelung))) return;
+  //pin.value = (soll_value - akt_value);
+  return;
 }
 
 void handleApiRequest() {
 
   Serial.println("### API Request:");
-    /* 
+  /*
     // DEBUG CODE
     String headers;
     headers += "HTTP Headers:\n";
     headers += server.headers();
     headers += "\n";
     for (uint8_t i = 0; i < server.headers(); i++) {
-      headers += " " + server.headerName(i) + ": " + server.header(i) + "\n";
+    headers += " " + server.headerName(i) + ": " + server.header(i) + "\n";
     }
     Serial.println(headers);
-    */
-    if (server.hasArg("plain") == false) { //Check if body received
-      server.send(200, "text/plain", "Body not received");
-      return;
-    }
+  */
+  if (server.hasArg("plain") == false) { //Check if body received
+    server.send(200, "text/plain", "Body not received");
+    return;
+  }
 
-    /*
+  /*
     // DEBUG CODE
     String message;
     headers += "HTTP args:\n";
     message += server.args();
     message += "\n";
     for (uint8_t i = 0; i < server.args(); i++) {
-      message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
     }
     Serial.println(message);
     Serial.println(server.arg("plain"));
-    */
-    
-    const size_t bufferSize = JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(4) + 70;
-    DynamicJsonDocument jsonDocument(bufferSize);
-    deserializeJson(jsonDocument, server.arg("plain"));
+  */
 
-    Serial.println("JSON Body: ");
-    serializeJson(jsonDocument, Serial);
-    Serial.println();
+  const size_t bufferSize = JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(4) + 70;
+  DynamicJsonDocument jsonDocument(bufferSize);
+  deserializeJson(jsonDocument, server.arg("plain"));
 
-    JsonObject root = jsonDocument.as<JsonObject>();
-    char modus = root["Modus"];
-    char messobjekt = root["Objekt"];
-    int timerange = root["Zeit"];
-    Serial.println(modus,DEC);
-    Serial.println(messobjekt,DEC);
-    Serial.println(timerange,DEC);
-    
-    server.send(200, "application/json", server.arg("plain"));
+  Serial.println("JSON Body: ");
+  serializeJson(jsonDocument, Serial);
+  Serial.println();
 
-    Messung(modus, messobjekt, timerange);
+  JsonObject root = jsonDocument.as<JsonObject>();
+  char modus = root["Modus"];
+  char messobjekt = root["Objekt"];
+  int timerange = root["Zeit"];
+  Serial.println(modus, DEC);
+  Serial.println(messobjekt, DEC);
+  Serial.println(timerange, DEC);
+
+  server.send(200, "application/json", server.arg("plain"));
+
+  starte_Messung(modus, messobjekt, timerange);
 }
 
 void handleData()
 {
   DynamicJsonDocument doc(1024);
-  
-  double gas = 0, distance = 0, VALUE=1;
-  char measure_data[100] = {1,2,3};
- 
-  doc["distance"]=distance;
-  doc["gas"]=gas;
+
+  double gas = 0, distance = 0, VALUE = 1;
+  char measure_data[100] = {1, 2, 3};
+
+  doc["distance"] = distance;
+  doc["gas"] = gas;
   char lenght = sizeof(measure_data);
-  doc["lenght"]=lenght;
-  
-  for(int i = 0; i<lenght;i++){
-    doc["data"][i]=measure_data[i];
-    Serial.println(measure_data[i],DEC);
+  doc["lenght"] = lenght;
+
+  for (int i = 0; i < lenght; i++) {
+    //doc["data"][i] = measure_data[i];
+    doc["data"][i] = Messdaten[i];
+    //Serial.println(measure_data[i], DEC);
   }
-  
-  serializeJson(doc,Serial);
+
+  serializeJson(doc, Serial);
   // Prepare the data for serving it over HTTP
   String output = "distance: " + String(distance) + "\n";
   output += "CO level: " + String(gas);
@@ -143,13 +247,13 @@ void handleData()
   //server.send(200,"text/plain",output);
   //server.send(200,"application/json",server.arg(doc));
   String buf;
-  serializeJson(doc,buf);
+  serializeJson(doc, buf);
   server.send(200, F("application/json"), buf);
 }
 
 
-
 void setup(void) {
+  resetOutputs();
   Serial.begin(115200);
 
   WiFi.mode(WIFI_STA);
@@ -157,14 +261,14 @@ void setup(void) {
   WiFi.config(clientIP, gateway, subnet); // Remove for DHCP
 
   WiFi.begin(ssid, password);
-//Serial.print("start");
-//WiFi.softAP(ap_ssid,ap_password);
-//    Serial.print("Access Point is Created with SSID: ");
-//    Serial.println(ap_ssid);
-//    Serial.print("Max Connections Allowed: ");
-//    Serial.println(max_connections);
-//    Serial.print("Access Point IP: ");
-//    Serial.println(WiFi.softAPIP());
+  //Serial.print("start");
+  //WiFi.softAP(ap_ssid,ap_password);
+  //    Serial.print("Access Point is Created with SSID: ");
+  //    Serial.println(ap_ssid);
+  //    Serial.print("Max Connections Allowed: ");
+  //    Serial.println(max_connections);
+  //    Serial.print("Access Point IP: ");
+  //    Serial.println(WiFi.softAPIP());
 
   Serial.println("");
 
@@ -195,15 +299,15 @@ void setup(void) {
   server.onNotFound(handleNotFound);
 
   // iro.js User Interface and Javascript
-  server.on("/ui", HTTP_GET, []() {
-    server.send_P(200, "text/html", WEBINTERFACE);
-  });
+  //  server.on("/ui", HTTP_GET, []() {
+  //    server.send_P(200, "text/html", WEBINTERFACE);
+  //  });
   server.on("/admin", HTTP_GET, []() {
     server.send_P(200, "text/html", WEBADMIN);
   });
-  server.on("/iro.min.js", HTTP_GET, []() {
-    server.send_P(200, "application/javascript", IRO_JS);
-  });
+  //  server.on("/iro.min.js", HTTP_GET, []() {
+  //    server.send_P(200, "application/javascript", IRO_JS);
+  //  });
   server.on("/jquery-3.3.1.min.js", HTTP_GET, []() {
     server.send_P(200, "application/javascript", JQUERY_JS);
   });
@@ -213,17 +317,17 @@ void setup(void) {
   server.on("/bootstrap.min.js", HTTP_GET, []() {
     server.send_P(200, "application/javascript", BOOTSTRAP_JS);
   });
-  server.on("/rawdata",handleData);
+  server.on("/rawdata", handleData);
   server.on("/data", HTTP_GET, []() {
     server.send_P(200, "text/html", WEBDATA);
   });
-//  server.on("/jsxgraphcore.js", HTTP_GET, []() {
-//    server.send_P(200, "application/javascript", JSXGRAPH_JS);
-//  });
-//  server.on("/jsxgraph.css", HTTP_GET, []() {
-//    server.send_P(200, "text/css", JSXGRAPH_CSS);
-//  });
-   
+  //  server.on("/jsxgraphcore.js", HTTP_GET, []() {
+  //    server.send_P(200, "application/javascript", JSXGRAPH_JS);
+  //  });
+  //  server.on("/jsxgraph.css", HTTP_GET, []() {
+  //    server.send_P(200, "text/css", JSXGRAPH_CSS);
+  //  });
+
   // REST-API
   server.on("/api/v1/state", HTTP_POST, handleApiRequest);
   server.on("/api/v1/data", HTTP_POST, handleData);
@@ -235,4 +339,5 @@ void setup(void) {
 
 void loop(void) {
   server.handleClient();
+  handleMessung();
 }
