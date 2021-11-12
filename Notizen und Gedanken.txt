@@ -74,6 +74,7 @@ pin.value = (soll_value-akt_value);
 
 
 
+
 if (akt_time < Messzeit && modus == 1 && start_messung == true)
 akt_time = millis()-start_zeitpunkt;
 if(akt_timelast_time)

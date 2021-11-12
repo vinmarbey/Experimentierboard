@@ -18,8 +18,8 @@ const char* ssid = "Lord LANdemort";
 const char* password = "79351652776124235782";
 const char* deviceName = "wifi-rgb";
 
-unsigned char Messdaten[100];
-unsigned char zaehler_Messdaten=0; 
+unsigned char Messdaten[60];
+unsigned char zaehler_Messdaten = 0;
 char control_messung = 0;
 #define sprung 0
 #define regelung 1
@@ -27,7 +27,7 @@ char control_messung = 0;
 char control_messobjekt = 0;
 int control_messzeitspanne;
 unsigned long start_zeitpunkt = 0;
-unsigned long zeitliche_aufloesung = 250;
+unsigned long resolution;
 unsigned long akt_time, delta_time, last_time = 0;
 int akt_value;
 
@@ -113,8 +113,8 @@ void starte_Messung(char modus, char messobjekt, int timerange) {
   }
   control_messzeitspanne = timerange;
   zaehler_Messdaten = 0;
-  for(int i = 0; i < sizeof(Messdaten);i++){
-    Messdaten[i]=0;
+  for (int i = 0; i < sizeof(Messdaten); i++) {
+    Messdaten[i] = 0;
   }
   control_messung |= (1 << start_messung);
   start_zeitpunkt = millis();
@@ -139,7 +139,7 @@ void stoppe_Messung() {
 }
 
 void handleMessung() {
-  
+
   if (!(control_messung & (1 << start_messung))) return; // soll überhaupt gerade gemessen werden
   akt_time = millis() - start_zeitpunkt;
   //Serial.println(akt_time, DEC);
@@ -151,16 +151,16 @@ void handleMessung() {
     return;
   }
   delta_time = akt_time - last_time;
-  
 
-  if (delta_time < zeitliche_aufloesung) return; // die Zeit zur nächsten mesung ist noch nicht dran
+
+  if (delta_time < resolution) return; // die Zeit zur nächsten mesung ist noch nicht dran
   //Serial.println(delta_time, DEC);
   last_time = akt_time;
   akt_value = analogRead(A0);
-  Serial.println(akt_value, DEC);
+  //Serial.println(akt_value, DEC);
   Messdaten[zaehler_Messdaten] = (unsigned char) akt_value;
   zaehler_Messdaten ++;
-  
+
   //2 D Array füllen
 
   if (!(control_messung &  (1 << regelung))) return;
@@ -200,7 +200,7 @@ void handleApiRequest() {
     Serial.println(server.arg("plain"));
   */
 
-  const size_t bufferSize = JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(4) + 70;
+  const size_t bufferSize = JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(4) + 70;
   DynamicJsonDocument jsonDocument(bufferSize);
   deserializeJson(jsonDocument, server.arg("plain"));
 
@@ -209,21 +209,47 @@ void handleApiRequest() {
   Serial.println();
 
   JsonObject root = jsonDocument.as<JsonObject>();
-  char modus = root["Modus"];
-  char messobjekt = root["Objekt"];
-  int timerange = root["Zeit"];
-  Serial.println(modus, DEC);
-  Serial.println(messobjekt, DEC);
-  Serial.println(timerange, DEC);
+  int timerange, gain;
+  char start_measurement = root["Start"];
+  char stop_measurement = root["Stop"];
+  if (start_measurement == 1) {
+    char modus = root["Modus"];
+    char messobjekt = root["Objekt"];
+    if (modus == 1) {
+      timerange = root["Zeit"];
+      resolution = root["Aufloesung"];
+      Serial.println(modus, DEC);
+      Serial.println(messobjekt, DEC);
+      Serial.println(timerange, DEC);
+      Serial.println(resolution, DEC);
+      server.send(200, "application/json", server.arg("plain"));
 
-  server.send(200, "application/json", server.arg("plain"));
+      starte_Messung(modus, messobjekt, timerange);
+    } else if (modus == 2) {
+      Serial.println("Regelung");
+      timerange = root["Zeit2"];
+      resolution = root["Aufloesung2"];
+      gain = root["Verstaerkung2"];
+      Serial.println(modus, DEC);
+      Serial.println(messobjekt, DEC);
+      Serial.println(gain, DEC);
+      Serial.println(timerange, DEC);
+      Serial.println(resolution, DEC);
 
-  starte_Messung(modus, messobjekt, timerange);
+      server.send(200, "application/json", server.arg("plain"));
+
+      starte_Messung(modus, messobjekt, timerange);
+    } else if (stop_measurement == 1) {
+      server.send(200, "application/json", server.arg("plain"));
+      stoppe_Messung();
+    }
+  }
 }
 
 void handleData()
 {
-  DynamicJsonDocument doc(1024);
+  DynamicJsonDocument doc(1024);//6144 für 256 elemente
+  //DynamicJsonDocument doc(2048);
 
   double gas = 0, distance = 0, VALUE = 1;
   char measure_data[100] = {1, 2, 3};
