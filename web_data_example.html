@@ -5,17 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     
+    
+    
     <title>WifiRGB Controller Admin</title>
     
     <style>
-      /* Sticky footer styles
-      -------------------------------------------------- */
       html {
         position: relative;
         min-height: 100%;
       }
       body {
-        /* Margin bottom by footer height */
         margin-bottom: 60px;
         padding: 0px 15px 0;
       }
@@ -23,9 +22,8 @@
         position: absolute;
         bottom: 0;
         width: 100%;
-        /* Set the fixed height of the footer here */
         height: 60px;
-        line-height: 60px; /* Vertically center the text there */
+        line-height: 60px;
         background-color: #f5f5f5;
       }
       h2 {
@@ -51,12 +49,40 @@
         line-height: 1.5;
         border-radius: .25rem;
         transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        background-color: #F2EFE9;
       }
       .btn:hover{
-        color: #fff;
-        background-color: #0069d9;
-        border-color: #0062cc;
+        color: #080708;
+        background-color: #3772FF;
+        border-color: #252627;
       }
+      .btn:active{
+      	background-color:#904E55;
+      }
+      input,
+	  textarea {
+  		background: none;
+  		color: $muted-color;
+  		font-size: 18px;
+  		padding: 10px 10px 10px 5px;
+  		display: block;
+  		width: $width;
+  		border: none;
+  		border-radius: 0;
+  		border-bottom: 1px solid $muted-color;
+  		&:focus {
+    	  outline: none;
+  		}
+  		&:focus ~ label,
+  		&:valid ~ label {
+    	  top: -14px;
+    	  font-size: 12px;
+    	  color: $hl-color;
+  		}
+  		&:focus ~ .bar:before {
+    	  width: $width;
+  		}
+	  }
       code {
         font-size: 80%;
       }
@@ -74,77 +100,64 @@
             <button id="printData" type="button" onclick="printData()" class="btn">print example data</button>
             <p>gemessene Daten:</p>
             <div id="datacontent"></div>
-            
+            <div id="capture">
+              <div id="box" class="jxgbox" style="width:700px; height:500px;"></div>
+            </div>
+             <a><button id="pbtn" class="button">Drucken</button></a>
     </main>
     
     <footer class="footer">
     </footer>
     
-        <script src="./jquery-3.3.1.min.js"></script>
+    <script src="./jquery-3.3.1.min.js"></script>
     <script src="./popper.min.js"></script>
     <script src="./bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://jsxgraph.org/distrib/jsxgraphcore.js"></script>
-    
+    <!--<link rel="stylesheet" type="text/css" href="https://jsxgraph.org/distrib/jsxgraph.css" />-->
+    <!--<script type="text/javascript" src="https://jsxgraph.org/distrib/jsxgraphcore.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="jsxgraph.css" />
+  	<script type="text/javascript" src="jsxgraphcore.js"></script>
+    <script src="drucken.js"></script>
+
     <script>
     $("#getData" ).click(function() {
-//            $.get("/rawdata", function(data, status){
-//    alert("Data: " + data + "\nStatus: " + status);
-//  });
-
-   $.ajax({
+    $.ajax({
     url:"/rawdata",
     contentType: "application/json",
         dataType: 'json',
         success: function(json) {
-          console.log(json);   // needs to match the payload (i.e. json must have {value: "foo"}
+          console.log(json);
           value = json.data;
+          resolution = json.resolution;
           console.log(value);
           document.getElementById("datacontent").innerHTML = value;
             
-            var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0.5, 255, value.length/10+0.5, -0.5], axis:true});
-            var points = []
-            for (let i = 0; i<value.length;i++){
-            points[i] = board.create('point',[i/10,value[i]]);
-            }
+          //printData();
+        
           },
           error: function(e) {
           console.log("jQuery error message = "+e.message);
         }
       });
-      
-
-  
-//      $.ajax("/api/v1/state", { data: JSON.stringify(json), dataType: "json", method: "POST", contentType: "application/json", cache: false, timeout: 2000})
-//        .done(function( data ) {
-//          console.log( "Response: " );
-//          console.log( data );
-//          //alert(data);
-//        })
-//        .fail(function( data ) {
-//          console.log( "Error: " );
-//          console.log( data );
-//        //  alert(data);
-//        });
     });
-    </script>
-      <div id="box" class="jxgbox" style="width:500px; height:500px;"></div>
-    <script>
-      function printData() {
-            var example_value = [4,29,52,75,96,116,136,159,177,197,214,230,247,264,280,295,309,325,339,351,365,377,388,401,413,427,438,448,459,469,477,487,496,505,513,522,530,537,545,553,560,567,573,580,586,592,598,604,608,615,619,625,629,634,640,644,648,652,656,661,664]
-            var example_value_max = Math.max(...example_value);
-            //document.getElementById("datacontent").innerHTML = value;
-            document.getElementById("datacontent").innerHTML = example_value;
-            
-            var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0.5, example_value_max+5, example_value.length/10+0.5, -1], axis:true});
-            var points = []
-            for (let i = 0; i<example_value.length;i++){
-            points[i] = board.create('point',[i/10,example_value[i]]);
-            }
+
+    function printData() {
+        var example_value = [4,29,52,75,96,116,136,159,177,197,214,230,247,264,280,295,309,325,339,351,365,377,388,401,413,427,438,448,459,469,477,487,496,505,513,522,530,537,545,553,560,567,573,580,586,592,598,604,608,615,619,625,629,634,640,644,648,652,656,661,664];
+        var example_resolution = 250;
+        var meas_values = [];
+        for (let i = 0; i<example_value.length;i++){
+          meas_values[i] = example_value[i]*3.3/1023;
         }
-    </script>
-    
-    <script type="text/javascript">
-      
+        var example_value_max = Math.max(...meas_values);
+        var example_value_length = meas_values.length;
+		document.getElementById("datacontent").innerHTML = meas_values;
+            
+        var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0.7, example_value_max+0.7, example_value_length*example_resolution/1000+1, -0.5], axis:true,
+          defaultAxes: { x:{ name: 'Zeit [s]', withLabel: true, label:{ position: 'rt', offset: [-20, -20]}}, y:{ withLabel:true, name: 'Spannung [V]', label:{ position: 'rt',offset: [5, -15]}}}});
+        var points = [];
+        for (let i = 0; i<example_value_length;i++){
+          points[i] = board.create('point',[i*example_resolution/1000,meas_values[i]],{withLabel:false, fixed:true});
+        }
+    }
     </script>
   </body>
 </html>
