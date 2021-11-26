@@ -6,9 +6,6 @@
 
 
 #include "web_admin.h"
-
-#include "web_jquery_js.h"
-
 #include "web_data.h"
 #include "web_jsxgraph_js.h"
 #include "web_jsxgraph_css.h"
@@ -29,8 +26,8 @@ const char* password = "79351652776124235782";
 const char* deviceName = "wifi-rgb";
 
 //confic Access-Point-Mode
-//const char* ap_ssid = "ESP8266_1";
-//const char* ap_password= "12345678";
+const char* ap_ssid = "ESP8266_1";
+const char* ap_password= "12345678";
 //uint8_t max_connections=8;
 
 unsigned char Messdaten[60];
@@ -66,19 +63,20 @@ void setup(void) {
   resetOutputs();
   Serial.begin(115200);
 
-  WiFi.mode(WIFI_STA);
+  //WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_AP_STA);
   WiFi.hostname(deviceName);
   WiFi.config(clientIP, gateway, subnet); // Remove for DHCP
 
   WiFi.begin(ssid, password);
   //Serial.print("start");
-  //WiFi.softAP(ap_ssid,ap_password);
+  WiFi.softAP(ap_ssid,ap_password);
   //    Serial.print("Access Point is Created with SSID: ");
   //    Serial.println(ap_ssid);
   //    Serial.print("Max Connections Allowed: ");
   //    Serial.println(max_connections);
   //    Serial.print("Access Point IP: ");
-  //    Serial.println(WiFi.softAPIP());
+      Serial.println(WiFi.softAPIP());
 
   Serial.println("");
 
@@ -113,10 +111,6 @@ void setup(void) {
   server.on("/admin", HTTP_GET, []() {
     server.send_P(200, "text/html", WEBADMIN);
   });
-  server.on("/jquery-3.3.1.min.js", HTTP_GET, []() {
-    server.send_P(200, "application/javascript", JQUERY_JS);
-  });
-
   server.on("/rawdata", handleData);
   server.on("/data", HTTP_GET, []() {
     server.send_P(200, "text/html", WEBDATA);
@@ -124,12 +118,12 @@ void setup(void) {
   server.on("/drucken.js", HTTP_GET, []() {
     server.send_P(200, "application/javascript", DRUCKEN_JS);
   });
-  //    server.on("/jsxgraphcore.js", HTTP_GET, []() {
-  //      server.send_P(200, "application/javascript", JSXGRAPH_JS);
-  //    });
-  //  server.on("/jsxgraph.css", HTTP_GET, []() {
-  //    server.send_P(200, "text/css", JSXGRAPH_CSS);
-  //  });
+      server.on("/jsxgraphcore.js", HTTP_GET, []() {
+        server.send_P(200, "application/javascript", JSXGRAPH_JS);
+      });
+    server.on("/jsxgraph.css", HTTP_GET, []() {
+      server.send_P(200, "text/css", JSXGRAPH_CSS);
+    });
 
   // REST-API
   server.on("/api/v1/state", HTTP_POST, handleApiRequest);
@@ -137,7 +131,7 @@ void setup(void) {
   //server.on("/api/v1/reset", HTTP_GET, resetOutputs);
 
   server.begin();
-  Serial.println("WifiRGB HTTP server started");
+  Serial.println("RegTech HTTP server started");
 }
 
 void loop(void) {

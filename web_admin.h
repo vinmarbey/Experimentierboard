@@ -4,7 +4,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WifiRGB Controller Admin</title>
+    <title>Regelungstechnik Experimentierboard</title>
     
     <style>
       html {
@@ -130,7 +130,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
               </table>
               <button id="submitValues" type="button" class="btn" style="visibility:hidden">Start</button>
               <button id="stopMessung" type="button" class="btn" style="visibility:hidden">Stop</button>
-              <a href="/data"> go to data</a>
+              <button id="gotosettings" type="button" class="btn"><a href="/data">go to data</a></button>
 
               
             </form>
@@ -139,14 +139,12 @@ const char WEBADMIN[] PROGMEM = R"=====(
     <footer class="footer">
     </footer>
     
-    <script src="./jquery-3.3.1.min.js"></script>
-    
     <script type="text/javascript">
     var Messmodus = 1;
     var Messobjekt = 1;
 
     const showSubmit = () => btnSubmit.style.visibility='visible';
-    const showStop = () => stopMessung.style.visibility='visible';
+    const showStop = () => stopMessung.style.visibility='hidden';
     const chanceBackgroundClickedSubmit = () => btnSubmit.style.backgroundColor = '#DF2935';
     const chanceBackgroundUnclickedSubmit = () => btnSubmit.style.backgroundColor = '#F2EFE9';
     const chanceBackgroundClickedStop = () => stopMessung.style.backgroundColor = '#DF2935';
@@ -235,34 +233,41 @@ const char WEBADMIN[] PROGMEM = R"=====(
       var MesszeitraumReg = parseInt(document.getElementById("MesszeitraumRegelung").value);
       var MessaufloesungReg = parseInt(document.getElementById("MessaufloesungRegelung").value);
       
-      var json = {Start:1,Stop:0,Modus:Messmodus,Objekt:Messobjekt,Zeit:MesszeitraumSprung,Aufloesung:MessaufloesungSprung,Verstaerkung2:VerstaerkungReg,Zeit2:MesszeitraumReg,Aufloesung2:MessaufloesungReg};
-      console.log(json);
-      console.log(JSON.stringify(json));
+      var json_start = {Start:1,Stop:0,Modus:Messmodus,Objekt:Messobjekt,Zeit:MesszeitraumSprung,Aufloesung:MessaufloesungSprung,Verstaerkung2:VerstaerkungReg,Zeit2:MesszeitraumReg,Aufloesung2:MessaufloesungReg};
+      console.log(json_start);
+      console.log(JSON.stringify(json_start));
       
-      $.ajax("/api/v1/state", { data: JSON.stringify(json), dataType: "json", method: "POST", contentType: "application/json", cache: false, timeout: 2000})
-        .done(function( data ) {
-          console.log( "Response: " );
-          console.log( data );
-        })
-        .fail(function( data ) {
-          console.log( "Error: " );
-          console.log( data );
-        });
+//      $.ajax("/api/v1/state", { data: JSON.stringify(json_start), dataType: "json", method: "POST", contentType: "application/json", cache: false, timeout: 2000})
+//        .done(function( data ) {
+//          console.log( "Response: " );
+//          console.log( data );
+//        })
+//        .fail(function( data ) {
+//          console.log( "Error: " );
+//          console.log( data );
+//        });
+      var request_start = new XMLHttpRequest();
+      request_start.open('POST','/api/v1/state',true);
+      request_start.send(JSON.stringify(json_start));
+      
     });
     
     var stopBtn = document.querySelector("#stopMessung");
     stopBtn.addEventListener("click",function(){
-      var json = {Start:0,Stop:1};
+      var json_stop = {Start:0,Stop:1};
       
-      $.ajax("/api/v1/state", { data: JSON.stringify(json), dataType: "json", method: "POST", contentType: "application/json", cache: false, timeout: 2000})
-        .done(function( data ) {
-          console.log( "Response: " );
-          console.log( data );
-        })
-        .fail(function( data ) {
-          console.log( "Error: " );
-          console.log( data );
-        });
+//      $.ajax("/api/v1/state", { data: JSON.stringify(json_stop), dataType: "json", method: "POST", contentType: "application/json", cache: false, timeout: 2000})
+//        .done(function( data ) {
+//          console.log( "Response: " );
+//          console.log( data );
+//        })
+//        .fail(function( data ) {
+//          console.log( "Error: " );
+//          console.log( data );
+//        });
+      var request_stop = new XMLHttpRequest();
+      request_stop.open('POST','/api/v1/state',true);
+      request_stop.send(JSON.stringify(json_stop));
     });
 
     </script>

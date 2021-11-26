@@ -70,7 +70,7 @@ void handleMessung() {
   if (delta_time < resolution) return; // die Zeit zur nächsten mesung ist noch nicht dran
   
   last_time = akt_time;
-  akt_value = analogRead(A0);
+  akt_value = analogRead(A0)/4;
   Messdaten[zaehler_Messdaten] = (unsigned char) akt_value;
   zaehler_Messdaten ++;
   //if (!(control_messung &  (1 << regelung))) return;

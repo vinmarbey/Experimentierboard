@@ -4,7 +4,7 @@ const char WEBDATA[] PROGMEM = R"=====(
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WifiRGB Controller Admin</title>
+    <title>Regelungstechnik Experimentierboard</title>
     
     <style>
       html {
@@ -94,7 +94,8 @@ const char WEBDATA[] PROGMEM = R"=====(
             <h2>DATA</h2>
             <p>get data and handle it</p>
             <button id="getData" type="button" class="btn">get and print measured data</button>
-            <button id="printData" type="button" onclick="printData()" class="btn">print example data</button>
+            <button id="printData" type="button" onclick="printData()" class="btn">reprint data</button>
+            <button id="gotosettings" type="button" class="btn"><a href="/admin">go to settings</a></button>
             <div id="capture">
             <p>Parameter der Messung:</p>
             <div id="datacontent"></div>
@@ -108,42 +109,70 @@ const char WEBDATA[] PROGMEM = R"=====(
     
     <footer class="footer">
     </footer>
-    
-    <script src="./jquery-3.3.1.min.js"></script>
-    
-    <link rel="stylesheet" type="text/css" href="https://jsxgraph.org/distrib/jsxgraph.css" />
-    <script type="text/javascript" src="https://jsxgraph.org/distrib/jsxgraphcore.js"></script>
-    <!--<link rel="stylesheet" type="text/css" href="jsxgraph.css" />-->
-    <!--<script src="jsxgraphcore.js"></script>-->
-    <script src="drucken.js"></script>
+   
+    <!--<link rel="stylesheet" type="text/css" href="https://jsxgraph.org/distrib/jsxgraph.css" />-->
+    <!--<script type="text/javascript" src="https://jsxgraph.org/distrib/jsxgraphcore.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="jsxgraph.css" />
+    <script type="text/javascript" src="jsxgraphcore.js"></script>
+    <script type="text/css" src="drucken.js"></script>
 
     <script>
+    var value, modus, resolution, zeit, verstaerkung;
     var getdataBtn = document.querySelector("#getData");
     getdataBtn.addEventListener("click",function(){
-    $.ajax({
-    url:"/rawdata",
-    contentType: "application/json",
-        dataType: 'json',
-        success: function(json) {
-          console.log(json);
-          value = json.data;
-          console.log(value);
-          modus = json.modus;
-          resolution = json.resolution;
-          zeit = json.zeit;
-          if (modus == 2){
-            verstaerkung = json.verstaerkung;
-          }
-          
-          //document.getElementById("datacontent").innerHTML = value;
+//      $.ajax({
+//      url:"/rawdata",
+//      contentType: "application/json",
+//          dataType: 'json',
+//          success: function(json) {
+//            console.log(json);
+//            value = json.data;
+//            console.log(value);
+//            modus = json.modus;
+//            resolution = json.resolution;
+//            zeit = json.zeit;
+//            if (modus == 2){
+//              verstaerkung = json.verstaerkung;
+//            }
+//            
+//            //document.getElementById("datacontent").innerHTML = value;
+//              
+//            printData();
+//          
+//            },
+//            error: function(e) {
+//            console.log("jQuery error message = "+e.message);
+//          }
+//      });
+      
+      var request_data = new XMLHttpRequest();
+      request_data.open('POST','/rawdata',true);
+      request_data.onreadystatechange = function () {
+        if(request_data.readyState === XMLHttpRequest.DONE) {
+          var status = request_data.status;
+          if (status === 0 || (status >= 200 && status < 400)) {
+            // The request has been completed successfully
+            var body = request_data.response;
+            //console.log(body);
+            //console.log(JSON.parse(request_data.response));
+            var obj = JSON.parse(request_data.response);
+            //console.log(obj.data);
+            value = obj.data;
+            modus = obj.modus;
+            resolution = obj.resolution;
+            zeit = obj.zeit;
+            if (modus == 2){
+              verstaerkung = obj.verstaerkung;
+            }
+
+            printData();
             
-          printData();
-        
-          },
-          error: function(e) {
-          console.log("jQuery error message = "+e.message);
+          } else {
+            console.log("Status: " + status);
+          }
         }
-      });
+      };
+      request_data.send(null);
     });
 
     var example_value = [4,29,52,75,96,116,136,159,177,197,214,230,247,264,280,295,309,325,339,351,365,377,388,401,413,427,438,448,459,469,477,487,496,505,513,522,530,537,545,553,560,567,573,580,586,592,598,604,608,615,619,625,629,634,640,644,648,652,656,661,664];
@@ -153,7 +182,7 @@ const char WEBDATA[] PROGMEM = R"=====(
         
         var meas_values = [];
         for (let i = 0; i<value.length;i++){
-          meas_values[i] = value[i]*3.3/1023;
+          meas_values[i] = value[i]*3.3/255;
         }
         var example_value_max = Math.max(...meas_values);
         var example_value_length = meas_values.length;
@@ -176,7 +205,7 @@ const char WEBDATA[] PROGMEM = R"=====(
       var ArrayTimestamp_temp = [];
       for (let i = 0; i<value.length;i++) {
         ArrayTimestamp_temp[0] = i*resolution/1000;
-        ArrayTimestamp_temp[1] = value[i]*3.3/1023;
+        ArrayTimestamp_temp[1] = value[i]*3.3/255;
         dataArrayTimestamp.push([ArrayTimestamp_temp[0],ArrayTimestamp_temp[1]]);
       }
       exportToCsv('export.csv', dataArrayTimestamp);
