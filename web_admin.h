@@ -111,26 +111,42 @@ const char WEBADMIN[] PROGMEM = R"=====(
             <table>
               <div id="conficSprungantwort" class="form-group" style="display:none;">
                 
-                  <label>Sprungantwort Messzeitraum [ms] max: 15000ms</label>
-                  <input id="MesszeitraumSprungantwort" placeholder="0" value="10000"><br>
+                  <label>Sprungantwort Messzeitraum [ms] </label>
+                  <input id="MesszeitraumSprungantwort" placeholder="0" value="10000" onchange="check_number_elements_s()"><br>
                   <label>Auflösung Messung [ms]</label>
-                  <input id="MessaufloesungSprungantwort" placeholder="0" value="250">
+                  <input id="MessaufloesungSprungantwort" placeholder="0" value="250" onchange="check_number_elements_s()">
                 
               </div>
               <div id="conficRegelung" class="form-group" style="display:none;">
                 <div class="form-group">
-                  <label>Verstärkung</label>
+                  <p>Nachfolgend lassen sich folgende Regler mit ihrer jeweiligen Struktur auswählen:</p>
+                  <ul>
+                  <li>P-Regler u(t)=K_p * e(t)</li>
+                  <li>PI-Regler u(t)=K_p * (e(t) + 1/T_N *  &#x222b; e(&#x3C4;) d&#x3C4;</li>
+                  
+                  <br>
+                  <label for="pregler">P-Regler</label>
+                  <input type="radio" id="pregler" name="regler" value="1" checked>
+                  <label for="piregler">PI-Regler</label>
+                  <input type="radio" id="piregler" name="regler" value="2" >
+                  </ul>
+                  <label>Sollwert [mV] </label>
+                  <input id="SollwertRegelung" placeholder="0" value="2000"><br>
+                  <label>Verstärkung </label>
                   <input id="VerstaerkungRegelung" placeholder="0" value="1"><br>
-                  <label>Sprungantwort Messzeitraum [ms] max: 15000ms</label>
-                  <input id="MesszeitraumRegelung" placeholder="0" value="10000"><br>
+                  <label>Nachstellzeit [ms]</label>
+                  <input id="NachstellzeitRegelung" placeholder="0" value="5000"><br>
+                  <label>Sprungantwort Messzeitraum [ms] </label>
+                  <input id="MesszeitraumRegelung" placeholder="0" value="10000" onchange="check_number_elements_r()"><br>
                   <label>Auflösung Messung [ms]</label>
-                  <input id="MessaufloesungRegelung" placeholder="0" value="250">
+                  <input id="MessaufloesungRegelung" placeholder="0" value="250" onchange="check_number_elements_r()">
                 </div>
               </div>
               </table>
               <button id="submitValues" type="button" class="btn" style="visibility:hidden">Start</button>
               <button id="stopMessung" type="button" class="btn" style="visibility:hidden">Stop</button>
               <button id="gotosettings" type="button" class="btn"><a href="/data">go to data</a></button>
+              <p>Achtung: Erst nach Ablauf der Messzeit zur Datenseite wechseln!</p>
 
               
             </form>
@@ -140,10 +156,32 @@ const char WEBADMIN[] PROGMEM = R"=====(
     </footer>
     
     <script type="text/javascript">
+    function check_number_elements_s(){
+      var time_temp1 = document.getElementById("MesszeitraumSprungantwort").value;
+      var res_temp1 = document.getElementById("MessaufloesungSprungantwort").value;
+      if ((time_temp1/res_temp1) > 254){
+        alert("Es sind zu viele Messpunkte ausgewählt worden. Die maximale Anzahl an Messpunkten liegt bei 254.");
+        hideSubmit();
+      }else {
+        showSubmit();
+      }
+    }
+    function check_number_elements_r(){
+      var time_temp1 = document.getElementById("MesszeitraumRegelung").value;
+      var res_temp1 = document.getElementById("MessaufloesungRegelung").value;
+      if ((time_temp1/res_temp1) > 254){
+        alert("Es sind zu viele Messpunkte ausgewählt worden. Die maximale Anzahl an Messpunkten liegt bei 254.");
+        hideSubmit();
+      }else {
+        showSubmit();
+      }
+    }
+    
     var Messmodus = 1;
     var Messobjekt = 1;
 
     const showSubmit = () => btnSubmit.style.visibility='visible';
+    const hideSubmit = () => btnSubmit.style.visibility='hidden';
     const showStop = () => stopMessung.style.visibility='hidden';
     const chanceBackgroundClickedSubmit = () => btnSubmit.style.backgroundColor = '#DF2935';
     const chanceBackgroundUnclickedSubmit = () => btnSubmit.style.backgroundColor = '#F2EFE9';
@@ -228,12 +266,19 @@ const char WEBADMIN[] PROGMEM = R"=====(
       
       var MesszeitraumSprung = parseInt(document.getElementById("MesszeitraumSprungantwort").value);
       var MessaufloesungSprung = parseInt(document.getElementById("MessaufloesungSprungantwort").value);
-      
-      var VerstaerkungReg = parseInt(document.getElementById("VerstaerkungRegelung").value);
+
+      var checked_piregler = document.getElementById("piregler").checked;
+      if (checked_piregler == true){
+        var Reglerstruktur = 2;}
+      else{
+        var Reglerstruktur = 1;}
+      var VerstaerkungReg = parseInt(document.getElementById("VerstaerkungRegelung").value*100);
+      var SollwertReg = parseInt(document.getElementById("SollwertRegelung").value);
+      var NachstellzeitReg = parseInt(document.getElementById("NachstellzeitRegelung").value);
       var MesszeitraumReg = parseInt(document.getElementById("MesszeitraumRegelung").value);
       var MessaufloesungReg = parseInt(document.getElementById("MessaufloesungRegelung").value);
       
-      var json_start = {Start:1,Stop:0,Modus:Messmodus,Objekt:Messobjekt,Zeit:MesszeitraumSprung,Aufloesung:MessaufloesungSprung,Verstaerkung2:VerstaerkungReg,Zeit2:MesszeitraumReg,Aufloesung2:MessaufloesungReg};
+      var json_start = {Start:1,Stop:0,Modus:Messmodus,Objekt:Messobjekt,Zeit:MesszeitraumSprung,Aufloesung:MessaufloesungSprung,Zeit2:MesszeitraumReg,Aufloesung2:MessaufloesungReg,Regelstruktur:Reglerstruktur,Sollwert:SollwertReg,Verstaerkung:VerstaerkungReg,Nachstellzeit:NachstellzeitReg};
       console.log(json_start);
       console.log(JSON.stringify(json_start));
       

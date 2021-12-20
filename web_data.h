@@ -101,7 +101,7 @@ const char WEBDATA[] PROGMEM = R"=====(
             <div id="datacontent"></div>
             <div id="parmeter"></div>
             <p>Verlauf der Messung:</p>
-            <div id="box" class="jxgbox" style="width:700px; height:500px;"></div>
+            <div id="box" class="jxgbox" style="width:700px; height:500px;">Wenn kein blauer Rand gezeigt wird, Seite neu laden.</div>
             </div>
              <a><button id="pbtn" class="button">Drucken</button></a>
              <button id="printData" type="button" onclick="dataToArrayWithTimestamp()" class="btn">Export to CSV</button>
@@ -114,36 +114,13 @@ const char WEBDATA[] PROGMEM = R"=====(
     <!--<script type="text/javascript" src="https://jsxgraph.org/distrib/jsxgraphcore.js"></script>-->
     <link rel="stylesheet" type="text/css" href="jsxgraph.css" />
     <script type="text/javascript" src="jsxgraphcore.js"></script>
-    <script type="text/css" src="drucken.js"></script>
+    <!--<script type="text/css" src="drucken.js"></script>-->
 
     <script>
-    var value, modus, resolution, zeit, verstaerkung;
+    var value, modus, resolution, zeit, verstaerkung,Regelstruktur, sollwert, nachstellzeit;
     var getdataBtn = document.querySelector("#getData");
     getdataBtn.addEventListener("click",function(){
-//      $.ajax({
-//      url:"/rawdata",
-//      contentType: "application/json",
-//          dataType: 'json',
-//          success: function(json) {
-//            console.log(json);
-//            value = json.data;
-//            console.log(value);
-//            modus = json.modus;
-//            resolution = json.resolution;
-//            zeit = json.zeit;
-//            if (modus == 2){
-//              verstaerkung = json.verstaerkung;
-//            }
-//            
-//            //document.getElementById("datacontent").innerHTML = value;
-//              
-//            printData();
-//          
-//            },
-//            error: function(e) {
-//            console.log("jQuery error message = "+e.message);
-//          }
-//      });
+
       
       var request_data = new XMLHttpRequest();
       request_data.open('POST','/rawdata',true);
@@ -153,16 +130,25 @@ const char WEBDATA[] PROGMEM = R"=====(
           if (status === 0 || (status >= 200 && status < 400)) {
             // The request has been completed successfully
             var body = request_data.response;
-            //console.log(body);
+            console.log(body);
             //console.log(JSON.parse(request_data.response));
             var obj = JSON.parse(request_data.response);
             //console.log(obj.data);
             value = obj.data;
+            value1 = obj.data1;
+            value2 = obj.data2;
+            value3 = obj.data3;
+            value4 = obj.data4;
+            //console.log(value);
             modus = obj.modus;
             resolution = obj.resolution;
             zeit = obj.zeit;
             if (modus == 2){
-              verstaerkung = obj.verstaerkung;
+//              regelstruktur = obj.Regelstruktur;
+//              verstaerkung = obj.verstaerkung;
+//              sollwert = obj.sollwert;
+//              nachstellzeit = obj.nachstellzeit;
+              
             }
 
             printData();
@@ -175,31 +161,49 @@ const char WEBDATA[] PROGMEM = R"=====(
       request_data.send(null);
     });
 
-    var example_value = [4,29,52,75,96,116,136,159,177,197,214,230,247,264,280,295,309,325,339,351,365,377,388,401,413,427,438,448,459,469,477,487,496,505,513,522,530,537,545,553,560,567,573,580,586,592,598,604,608,615,619,625,629,634,640,644,648,652,656,661,664];
-    var example_resolution = 250;
+
 
     function printData() {
         
-        var meas_values = [];
-        for (let i = 0; i<value.length;i++){
-          meas_values[i] = value[i]*3.3/255;
-        }
-        var example_value_max = Math.max(...meas_values);
-        var example_value_length = meas_values.length;
+        var value_max = [];
+        value_max[0] = Math.max(...value);
+        value_max[1] = Math.max(...value1);
+        value_max[2] = Math.max(...value2);
+        value_max[3] = Math.max(...value3);
+        value_max[4] = Math.max(...value4);
+        var value_maximum = Math.max(...value_max);
+        var value_length = zeit/resolution;
+        console.log(value_length);
         if (modus == 2){
-          document.getElementById("parmeter").innerHTML = "Modus: " + "Regelung" + "<br>Messzeitzeit: " + zeit + " ms<br>Aufloesung: " + resolution + " ms<br>Verstaerkung: " + verstaerkung;
+          //console.log(regelstruktur);
+//          if(regelstruktur == 1){
+//           document.getElementById("parmeter").innerHTML = "Modus: " + "Regelung" + "<br>Reglerstruktur: " + "P-Regler" + "<br>Messzeitzeit: " + zeit + " ms<br>Aufloesung: " + resolution + " ms<br>Verstaerkung: " + verstaerkung + "<br>Sollwert: " + sollwert; 
+//          }else if(regelstruktur == 2){
+//           document.getElementById("parmeter").innerHTML = "Modus: " + "Regelung" + "<br>Reglerstruktur: " + "PI-Regler" + "<br>Messzeitzeit: " + zeit + " ms<br>Aufloesung: " + resolution + " ms<br>Verstaerkung: " + verstaerkung + "<br>Sollwert: " + sollwert  + "<br>Nachstellzeit: " + nachstellzeit; 
+//          }
         } else{
           document.getElementById("parmeter").innerHTML = "Modus: " + "Sprungantwort" + "<br>Messzeitzeit: " + zeit + " ms<br>Aufloesung: " + resolution + " ms";
         }
         //document.getElementById("datacontent").innerHTML = meas_values;
             
-        var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0.7, example_value_max+0.7, example_value_length*resolution/1000+1, -0.5], axis:true,defaultAxes: { x:{ name: 'Zeit [s]', withLabel: true, label:{ position: 'rt', offset: [-20, -20]}}, y:{ withLabel:true, name: 'Spannung [V]', label:{ position: 'rt',offset: [5, -15]}}}});
+        var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0.7, value_maximum*3.3/255+0.7, value_length*resolution/1000+1, -0.5], axis:true,defaultAxes: { x:{ name: 'Zeit [s]', withLabel: true, label:{ position: 'rt', offset: [-20, -20]}}, y:{ withLabel:true, name: 'Spannung [V]', label:{ position: 'rt',offset: [5, -15]}}}});
         var points = [];
-        for (let i = 0; i<example_value_length;i++){
-          points[i] = board.create('point',[i*resolution/1000,meas_values[i]],{withLabel:false, fixed:true});
+        for (let i = 0; i<value_length;i++){
+          if (i < 60){
+          points[i] = board.create('point',[i*resolution/1000,value[i]*3.3/255],{withLabel:false, fixed:true});
+          }else if (i <120){
+            points[i] = board.create('point',[i*resolution/1000,value1[i-60]*3.3/255],{withLabel:false, fixed:true});
+          }else if (i <180){
+            points[i] = board.create('point',[i*resolution/1000,value2[i-120]*3.3/255],{withLabel:false, fixed:true});
+          }else if (i <240){
+            points[i] = board.create('point',[i*resolution/1000,value3[i-180]*3.3/255],{withLabel:false, fixed:true});
+          }else if (i <300){
+            points[i] = board.create('point',[i*resolution/1000,value4[i-240]*3.3/255],{withLabel:false, fixed:true});
+          }
         }
+        
     }
-
+  
     function dataToArrayWithTimestamp(){
       var dataArrayTimestamp = [];
       var ArrayTimestamp_temp = [];
@@ -250,7 +254,45 @@ const char WEBDATA[] PROGMEM = R"=====(
             document.body.removeChild(link);
         }
     }
-}
+    }
+
+    var el = document.getElementById("pbtn");
+    el.addEventListener("click", function (eve) {
+      //console.log("click");
+      ausgabe();
+    });
+    function ausgabe() {
+      let node = document.querySelector("#capture");
+
+      let dupNode = node.cloneNode(true);
+
+      let printHTML = '<!DOCTYPE html>' +
+        '<html lang="de" dir="ltr">' +
+        '' +
+        '<head>' +
+        '  <meta charset="utf-8">' +
+        '  <meta name="viewport" content="width=device-width, initial-scale=1.0" />' +
+        '  <title>Druckvorschau</title>' +
+        '  <link rel="stylesheet" href="CSS/stylesheet.css">' +
+        '  <link rel="stylesheet" href="CSS/stylesheetP.css">' +
+        '</head>' +
+        '' +
+        '<body>' +
+        '</body>' +
+        '' +
+        '</html>';
+
+    let win = window.open('', 'printwindow');
+    win.document.write(printHTML);
+    win.document.body.appendChild(dupNode);
+
+    setTimeout(function () {
+      win.focus();
+      win.print();
+    }, 450);
+
+    win.onfocus = function () { setTimeout(function () { win.close(); }, 500); }
+  }
     </script>
   </body>
 </html>

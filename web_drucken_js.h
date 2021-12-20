@@ -1,6 +1,7 @@
 const char DRUCKEN_JS[] PROGMEM = R"=====(
 var el = document.getElementById("pbtn");
 el.addEventListener("click", function (eve) {
+  console.log("click");
   ausgabe();
 });
 

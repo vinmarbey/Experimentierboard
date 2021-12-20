@@ -14,8 +14,6 @@
 #define BUILTIN_LED 2 // internal ESP-12 LED on GPIO2
 
 #define MESSOBJEKT1 16
-#define MESSOBJEKT2 14
-#define MESSOBJEKT3 5
 #define sprung 0
 #define regelung 1
 #define start_messung 2
@@ -27,21 +25,24 @@ const char* deviceName = "wifi-rgb";
 
 //confic Access-Point-Mode
 const char* ap_ssid = "ESP8266_1";
-const char* ap_password= "12345678";
+const char* ap_password = "12345678";
 //uint8_t max_connections=8;
 
-unsigned char Messdaten[60];
+unsigned char Messdaten[254];
+
 unsigned char zaehler_Messdaten = 0;
 char control_messung = 0;
 
-char control_messobjekt = 0;
-int control_messzeitspanne;
+char control_messobjekt = 0, modus;
+char reglerstruktur;
+int control_messzeitspanne, timerange, resolution;
+int gain=100,sollwert=2000,nachstellzeit=5000;
 unsigned long start_zeitpunkt = 0;
-unsigned long resolution;
-char modus;
-int timerange, gain;
+
 unsigned long akt_time, delta_time, last_time = 0;
 int akt_value;
+int error, output_reg, integrate_temp;
+
 
 
 ESP8266WebServer server(80);
@@ -70,13 +71,13 @@ void setup(void) {
 
   WiFi.begin(ssid, password);
   //Serial.print("start");
-  WiFi.softAP(ap_ssid,ap_password);
-  //    Serial.print("Access Point is Created with SSID: ");
-  //    Serial.println(ap_ssid);
-  //    Serial.print("Max Connections Allowed: ");
-  //    Serial.println(max_connections);
-  //    Serial.print("Access Point IP: ");
-      Serial.println(WiFi.softAPIP());
+  WiFi.softAP(ap_ssid, ap_password);
+//  Serial.print("Access Point is Created with SSID: ");
+//  Serial.println(ap_ssid);
+//  Serial.print("Max Connections Allowed: ");
+//  Serial.println(max_connections);
+//  Serial.print("Access Point IP: ");
+  Serial.println(WiFi.softAPIP());
 
   Serial.println("");
 
@@ -91,13 +92,13 @@ void setup(void) {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("esp8266")) {
-    Serial.println("MDNS responder started");
-  }
+//  if (MDNS.begin("esp8266")) {
+//    Serial.println("MDNS responder started");
+//  }
 
   pinMode(BUILTIN_LED, OUTPUT); // Initialize the BUILTIN_LED pin as an output
   digitalWrite(BUILTIN_LED, LOW); // Turn the LED ON after wifi is connected
-  
+
   analogWriteRange(255);
 
   // Root and 404
@@ -115,15 +116,16 @@ void setup(void) {
   server.on("/data", HTTP_GET, []() {
     server.send_P(200, "text/html", WEBDATA);
   });
+  // API for scripts
   server.on("/drucken.js", HTTP_GET, []() {
     server.send_P(200, "application/javascript", DRUCKEN_JS);
   });
-      server.on("/jsxgraphcore.js", HTTP_GET, []() {
-        server.send_P(200, "application/javascript", JSXGRAPH_JS);
-      });
-    server.on("/jsxgraph.css", HTTP_GET, []() {
-      server.send_P(200, "text/css", JSXGRAPH_CSS);
-    });
+  server.on("/jsxgraphcore.js", HTTP_GET, []() {
+    server.send_P(200, "application/javascript", JSXGRAPH_JS);
+  });
+  server.on("/jsxgraph.css", HTTP_GET, []() {
+    server.send_P(200, "text/css", JSXGRAPH_CSS);
+  });
 
   // REST-API
   server.on("/api/v1/state", HTTP_POST, handleApiRequest);
