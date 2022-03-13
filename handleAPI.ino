@@ -46,10 +46,10 @@ void handleApiRequest() {
     } else if (modus == 2) {
       timerange = root["Zeit2"];
       resolution = root["Aufloesung2"];
-//      reglerstruktur = root["Regelstruktur"];
-//      gain = root["Verstaerkung"];
-//      sollwert = root["Sollwert"];
-//      nachstellzeit = root["Nachstellzeit"];
+      reglerstruktur = root["Regelstruktur"];
+      gain = root["Verstaerkung"];
+      sollwert = root["Sollwert"];
+      nachstellzeit = root["Nachstellzeit"];
 
       server.send(200, "application/json", server.arg("plain"));
 
@@ -75,10 +75,10 @@ void handleData()
   doc["modus"] = modus;
   doc["zeit"] = timerange;
   if (modus == 2) {
-//    doc["verstaerkung"] = gain;
-//    doc["Regelstruktur"] = reglerstruktur;
-//    doc["Sollwert"] = sollwert;
-//    doc["Nachstellzeit"] = nachstellzeit;
+    doc["verstaerkung"] = gain;
+    doc["Regelstruktur"] = reglerstruktur;
+    doc["Sollwert"] = sollwert;
+    doc["Nachstellzeit"] = nachstellzeit;
   }
   char lenght = sizeof(Messdaten);
   doc["lenght"] = lenght;

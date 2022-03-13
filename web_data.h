@@ -92,7 +92,7 @@ const char WEBDATA[] PROGMEM = R"=====(
   <!-- Begin page content -->
   <main >
             <h2>DATA</h2>
-            <p>get data and handle it</p>
+            <!-- <p>get data and handle it</p> -->
             <button id="getData" type="button" class="btn">get and print measured data</button>
             <button id="printData" type="button" onclick="printData()" class="btn">reprint data</button>
             <button id="gotosettings" type="button" class="btn"><a href="/admin">go to settings</a></button>
@@ -144,10 +144,11 @@ const char WEBDATA[] PROGMEM = R"=====(
             resolution = obj.resolution;
             zeit = obj.zeit;
             if (modus == 2){
-//              regelstruktur = obj.Regelstruktur;
-//              verstaerkung = obj.verstaerkung;
-//              sollwert = obj.sollwert;
-//              nachstellzeit = obj.nachstellzeit;
+              regelstruktur = obj.Regelstruktur;
+              verstaerkung = obj.verstaerkung;
+              sollwert = obj.Sollwert;
+              nachstellzeit = obj.nachstellzeit;
+              
               
             }
 
@@ -175,12 +176,13 @@ const char WEBDATA[] PROGMEM = R"=====(
         var value_length = zeit/resolution;
         console.log(value_length);
         if (modus == 2){
-          //console.log(regelstruktur);
-//          if(regelstruktur == 1){
-//           document.getElementById("parmeter").innerHTML = "Modus: " + "Regelung" + "<br>Reglerstruktur: " + "P-Regler" + "<br>Messzeitzeit: " + zeit + " ms<br>Aufloesung: " + resolution + " ms<br>Verstaerkung: " + verstaerkung + "<br>Sollwert: " + sollwert; 
-//          }else if(regelstruktur == 2){
-//           document.getElementById("parmeter").innerHTML = "Modus: " + "Regelung" + "<br>Reglerstruktur: " + "PI-Regler" + "<br>Messzeitzeit: " + zeit + " ms<br>Aufloesung: " + resolution + " ms<br>Verstaerkung: " + verstaerkung + "<br>Sollwert: " + sollwert  + "<br>Nachstellzeit: " + nachstellzeit; 
-//          }
+          //document.getElementById("parmeter").innerHTML = "Modus: " + "Regelung";
+          console.log(regelstruktur);
+          if(regelstruktur == 1){
+           document.getElementById("parmeter").innerHTML = "Modus: " + "Regelung" + "<br>Reglerstruktur: " + "P-Regler" + "<br>Messzeitzeit: " + zeit + " ms<br>Aufloesung: " + resolution + " ms<br>Verstaerkung: " + verstaerkung + "<br>Sollwert: " + sollwert; 
+          }else if(regelstruktur == 2){
+           document.getElementById("parmeter").innerHTML = "Modus: " + "Regelung" + "<br>Reglerstruktur: " + "PI-Regler" + "<br>Messzeitzeit: " + zeit + " ms<br>Aufloesung: " + resolution + " ms<br>Verstaerkung: " + verstaerkung + "<br>Sollwert: " + sollwert  + "<br>Nachstellzeit: " + nachstellzeit; 
+          }
         } else{
           document.getElementById("parmeter").innerHTML = "Modus: " + "Sprungantwort" + "<br>Messzeitzeit: " + zeit + " ms<br>Aufloesung: " + resolution + " ms";
         }

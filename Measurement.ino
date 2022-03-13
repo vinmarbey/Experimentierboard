@@ -72,8 +72,8 @@ void handleMessung() {
   }else if (reglerstruktur == 2){
     //PI-Regler
     integrate_temp += error * resolution;
-//    output_reg = int(gain/100 * (error + (integrate_temp/nachstellzeit)));
-output_reg = int(gain/100 * (error + (integrate_temp)));
+    //    output_reg = int(gain/100 * (error + (integrate_temp/nachstellzeit)));
+    output_reg = int(gain/100 * (error + (integrate_temp)));
   }
   analogWrite(MESSOBJEKT1, int(output_reg));
   return;

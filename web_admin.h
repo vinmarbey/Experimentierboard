@@ -146,7 +146,8 @@ const char WEBADMIN[] PROGMEM = R"=====(
               <button id="submitValues" type="button" class="btn" style="visibility:hidden">Start</button>
               <button id="stopMessung" type="button" class="btn" style="visibility:hidden">Stop</button>
               <button id="gotosettings" type="button" class="btn"><a href="/data">go to data</a></button>
-              <p>Achtung: Erst nach Ablauf der Messzeit zur Datenseite wechseln!</p>
+              <p>Achtung: Erst nach Ablauf der Messzeit zur Datenseite wechseln! Wenn die Zeit abgelaufen ist, werden Sie informiert.</p>
+              <h2 id="start_alert"></h2>
 
               
             </form>
@@ -229,7 +230,9 @@ const char WEBADMIN[] PROGMEM = R"=====(
         chanceBackgroundClickedStop();
       });
 
-      
+      function myGreeting() {
+          document.getElementById("start_alert").innerHTML = "Messzeit vorbei. Wechseln Sie nun zur Datenseite"
+      }
 
       function chooseSprungantwort() {
         document.getElementById("choosedMode").innerHTML = "Sprungantwort";
@@ -278,6 +281,11 @@ const char WEBADMIN[] PROGMEM = R"=====(
       var MesszeitraumReg = parseInt(document.getElementById("MesszeitraumRegelung").value);
       var MessaufloesungReg = parseInt(document.getElementById("MessaufloesungRegelung").value);
       
+      if (Messmodus == 1){
+          const myTimeout1 = setTimeout(myGreeting, MesszeitraumSprung);}
+      if (Messmodus == 2){
+          const myTimeout2 = setTimeout(myGreeting, MesszeitraumReg);}
+          
       var json_start = {Start:1,Stop:0,Modus:Messmodus,Objekt:Messobjekt,Zeit:MesszeitraumSprung,Aufloesung:MessaufloesungSprung,Zeit2:MesszeitraumReg,Aufloesung2:MessaufloesungReg,Regelstruktur:Reglerstruktur,Sollwert:SollwertReg,Verstaerkung:VerstaerkungReg,Nachstellzeit:NachstellzeitReg};
       console.log(json_start);
       console.log(JSON.stringify(json_start));
