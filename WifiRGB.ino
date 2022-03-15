@@ -13,7 +13,8 @@
 
 #define BUILTIN_LED 2 // internal ESP-12 LED on GPIO2
 
-#define MESSOBJEKT1 16
+#define MESSOBJEKT1 16 //PIN D0
+#define Status_LED 5 //PIN D1, LED ON, wenn Messung läuft
 #define sprung 0
 #define regelung 1
 #define start_messung 2
@@ -41,7 +42,8 @@ unsigned long start_zeitpunkt = 0;
 
 unsigned long akt_time, delta_time, last_time = 0;
 int akt_value;
-int error, output_reg, integrate_temp;
+int error, integrate_temp;
+float output_reg;
 
 
 

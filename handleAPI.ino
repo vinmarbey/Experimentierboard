@@ -31,7 +31,7 @@ void handleApiRequest() {
   deserializeJson(jsonDocument, server.arg("plain"));
 
   JsonObject root = jsonDocument.as<JsonObject>();
-
+  Serial.println(root);
   //char start_measurement = root["Start"];
   //char stop_measurement = root["Stop"];
   if (root["Start"] == 1) {

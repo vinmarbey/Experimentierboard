@@ -131,7 +131,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
                   <input type="radio" id="piregler" name="regler" value="2" >
                   </ul>
                   <label>Sollwert [mV] </label>
-                  <input id="SollwertRegelung" placeholder="0" value="2000"><br>
+                  <input id="SollwertRegelung" placeholder="0" value="1000"><br>
                   <label>Verstärkung </label>
                   <input id="VerstaerkungRegelung" placeholder="0" value="1"><br>
                   <label>Nachstellzeit [ms]</label>

@@ -145,9 +145,9 @@ const char WEBDATA[] PROGMEM = R"=====(
             zeit = obj.zeit;
             if (modus == 2){
               regelstruktur = obj.Regelstruktur;
-              verstaerkung = obj.verstaerkung;
+              verstaerkung = obj.verstaerkung/100;
               sollwert = obj.Sollwert;
-              nachstellzeit = obj.nachstellzeit;
+              nachstellzeit = obj.Nachstellzeit;
               
               
             }
