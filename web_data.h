@@ -217,22 +217,22 @@ const char WEBDATA[] PROGMEM = R"=====(
           value_stellg_max[4] = Math.max(...value_points_stellg4);
           var value_stellg_maximum = Math.max(...value_stellg_max);
           
-          var checkbox = board.create('checkbox', [1.5, value_maximum*3.3/255+0.5, 'show/hide Regelgröße'], {});
-          var checkbox2 = board.create('checkbox', [4, value_maximum*3.3/255+0.5, 'show/hide Führungsgröße'], {});
+          var checkbox = board.create('checkbox', [1.5, 3.6, 'show/hide Regelgröße'], {});
+          var checkbox2 = board.create('checkbox', [1.5, 3.3, 'show/hide Führungsgröße'], {});
           
           var axis2 = board.create('axis', [[value_length*resolution/1000, 0.0], [value_length*resolution/1000, value_stellg_maximum]], {withLabel:true, name: 'Stellgröße [V]', label:{ position: 'rt',offset: [-50, -15]},visible:false});
           var points_stellg = [];
           for (let i = 0; i<value_length;i++){
             if (i < 60){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg[i]*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg[i]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
             }else if (i <120){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg1[i-60]*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg1[i-60]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
             }else if (i <180){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg2[i-120]*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg2[i-120]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
             }else if (i <240){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg3[i-180]*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg3[i-180]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
             }else if (i <300){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg4[i-240]*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg4[i-240]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
             }
           }
 

@@ -135,7 +135,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
                   <label>Verstärkung </label>
                   <input id="VerstaerkungRegelung" placeholder="0" value="1"><br>
                   <label>Nachstellzeit [ms]</label>
-                  <input id="NachstellzeitRegelung" placeholder="0" value="5000"><br>
+                  <input id="NachstellzeitRegelung" placeholder="0" value="1000"><br>
                   <label>Regelung Messzeitraum [ms] </label>
                   <input id="MesszeitraumRegelung" placeholder="0" value="10000" onchange="check_number_elements_r()"><br>
                   <label>Auflösung Messung [ms]</label>
@@ -267,26 +267,26 @@ const char WEBADMIN[] PROGMEM = R"=====(
     var submitBtn = document.querySelector("#submitValues");
     submitBtn.addEventListener("click",function(){
       
-      var MesszeitraumSprung = parseInt(document.getElementById("MesszeitraumSprungantwort").value);
-      var MessaufloesungSprung = parseInt(document.getElementById("MessaufloesungSprungantwort").value);
+      var MesszeitraumS = parseInt(document.getElementById("MesszeitraumSprungantwort").value);
+      var MessaufloesungS = parseInt(document.getElementById("MessaufloesungSprungantwort").value);
 
       var checked_piregler = document.getElementById("piregler").checked;
       if (checked_piregler == true){
         var Reglerstruktur = 2;}
       else{
         var Reglerstruktur = 1;}
-      var VerstaerkungReg = parseInt(document.getElementById("VerstaerkungRegelung").value*100);
-      var SollwertReg = parseInt(document.getElementById("SollwertRegelung").value);
-      var NachstellzeitReg = parseInt(document.getElementById("NachstellzeitRegelung").value);
-      var MesszeitraumReg = parseInt(document.getElementById("MesszeitraumRegelung").value);
-      var MessaufloesungReg = parseInt(document.getElementById("MessaufloesungRegelung").value);
+      var VerstaerkungR = parseInt(document.getElementById("VerstaerkungRegelung").value*100);
+      var SollwertR = parseInt(document.getElementById("SollwertRegelung").value);
+      var NachstellzeitR = parseInt(document.getElementById("NachstellzeitRegelung").value);
+      var MesszeitraumR = parseInt(document.getElementById("MesszeitraumRegelung").value);
+      var MessaufloesungR = parseInt(document.getElementById("MessaufloesungRegelung").value);
       
       if (Messmodus == 1){
-          const myTimeout1 = setTimeout(myGreeting, MesszeitraumSprung);}
+          const myTimeout1 = setTimeout(myGreeting, MesszeitraumS);}
       if (Messmodus == 2){
-          const myTimeout2 = setTimeout(myGreeting, MesszeitraumReg);}
+          const myTimeout2 = setTimeout(myGreeting, MesszeitraumR);}
           
-      var json_start = {Start:1,Stop:0,Modus:Messmodus,Objekt:Messobjekt,Zeit:MesszeitraumSprung,Aufloesung:MessaufloesungSprung,Zeit2:MesszeitraumReg,Aufloesung2:MessaufloesungReg,Regelstruktur:Reglerstruktur,Sollwert:SollwertReg,Verstaerkung:VerstaerkungReg,Nachstellzeit:NachstellzeitReg};
+      var json_start = {Start:1,Modus:Messmodus,Zeit:MesszeitraumS,Aufloesung:MessaufloesungS,Zeit2:MesszeitraumR,Aufloesung2:MessaufloesungR,Regelstruktur:Reglerstruktur,Sollwert:SollwertR,Nachstellzeit:NachstellzeitR,Verstaerkung:VerstaerkungR,auffuellen:35};
       console.log(json_start);
       console.log(JSON.stringify(json_start));
       

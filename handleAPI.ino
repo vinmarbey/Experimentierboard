@@ -29,8 +29,11 @@ void handleApiRequest() {
   const size_t bufferSize = JSON_OBJECT_SIZE(9) + JSON_OBJECT_SIZE(4) + 70;
   DynamicJsonDocument jsonDocument(bufferSize);
   deserializeJson(jsonDocument, server.arg("plain"));
-
+//Serial.println("JSON Body: ");
+    //serializeJson(jsonDocument, Serial);
+    //Serial.println();
   JsonObject root = jsonDocument.as<JsonObject>();
+  
   //char start_measurement = root["Start"];
   //char stop_measurement = root["Stop"];
   if (root["Start"] == 1) {
@@ -49,7 +52,10 @@ void handleApiRequest() {
       gain = root["Verstaerkung"];
       sollwert = root["Sollwert"];
       nachstellzeit = root["Nachstellzeit"];
-
+      //Serial.println(sollwert);
+      //Serial.println(nachstellzeit);
+      //Serial.println(gain);
+      
       server.send(200, "application/json", server.arg("plain"));
 
       starte_Messung(modus, timerange);

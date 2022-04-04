@@ -25,7 +25,7 @@ void starte_Messung(char modus, int timerange) {
   
   start_zeitpunkt = millis();
   Serial.println("Starte Messung");
-  Serial.println(nachstellzeit);
+  
   return;
 }
 
@@ -71,11 +71,15 @@ void handleMessung() {
     
   }else if (reglerstruktur == 2){
     //PI-Regler
-    integrate_temp += error * resolution/1000;
-    //output_reg = (error + (integrate_temp/(nachstellzeit/1000.0)));
+    integrate_temp += error * resolution/1000.0;
+    output_reg = gain/100.0 * (error + (integrate_temp/(nachstellzeit/1000.0)));
+//    Serial.println(error);
+//    Serial.println(integrate_temp);
+//    Serial.println(output_reg);
     //output_reg = gain/100.0 * output_reg;
-    output_reg = gain/100.0 * (integrate_temp/(nachstellzeit/1000.0));
-    Stellgroesse[zaehler_Messdaten-1] = output_reg;
+    //output_reg = gain/100.0 * (integrate_temp/(nachstellzeit/1000.0));
+    if (output_reg > 255) output_reg=255;
+    Stellgroesse[zaehler_Messdaten-1] = output_reg/4;
     //output_reg = int(gain/100.0 * (error + (integrate_temp)));
   }
   analogWrite(MESSOBJEKT1, int(output_reg));
