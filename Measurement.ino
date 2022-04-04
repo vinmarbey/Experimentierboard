@@ -67,7 +67,7 @@ void handleMessung() {
   if (reglerstruktur == 1){
     //P-Regler
     output_reg = gain/100.0 * error;
-    Stellgroesse[zaehler_Messdaten-1] = output_reg;
+    Stellgroesse[zaehler_Messdaten-1] = output_reg/4;
     
   }else if (reglerstruktur == 2){
     //PI-Regler
