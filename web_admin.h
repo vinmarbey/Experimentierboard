@@ -136,7 +136,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
                   <input id="VerstaerkungRegelung" placeholder="0" value="1"><br>
                   <label>Nachstellzeit [ms]</label>
                   <input id="NachstellzeitRegelung" placeholder="0" value="5000"><br>
-                  <label>Sprungantwort Messzeitraum [ms] </label>
+                  <label>Regelung Messzeitraum [ms] </label>
                   <input id="MesszeitraumRegelung" placeholder="0" value="10000" onchange="check_number_elements_r()"><br>
                   <label>Auflösung Messung [ms]</label>
                   <input id="MessaufloesungRegelung" placeholder="0" value="250" onchange="check_number_elements_r()">

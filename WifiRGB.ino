@@ -30,6 +30,7 @@ const char* ap_password = "12345678";
 //uint8_t max_connections=8;
 
 unsigned char Messdaten[254];
+unsigned char Stellgroesse[254];
 
 unsigned char zaehler_Messdaten = 0;
 char control_messung = 0;

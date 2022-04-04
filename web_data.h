@@ -148,6 +148,11 @@ const char WEBDATA[] PROGMEM = R"=====(
               verstaerkung = obj.verstaerkung/100;
               sollwert = obj.Sollwert;
               nachstellzeit = obj.Nachstellzeit;
+              value_points_stellg = obj.data_stellg;
+              value_points_stellg1 = obj.data_stellg1;
+              value_points_stellg2 = obj.data_stellg2;
+              value_points_stellg3 = obj.data_stellg3;
+              value_points_stellg4 = obj.data_stellg4;
               
               
             }
@@ -188,7 +193,7 @@ const char WEBDATA[] PROGMEM = R"=====(
         }
         //document.getElementById("datacontent").innerHTML = meas_values;
             
-        var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0.7, value_maximum*3.3/255+0.7, value_length*resolution/1000+1, -0.5], axis:true,defaultAxes: { x:{ name: 'Zeit [s]', withLabel: true, label:{ position: 'rt', offset: [-20, -20]}}, y:{ withLabel:true, name: 'Spannung [V]', label:{ position: 'rt',offset: [5, -15]}}}});
+        var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0.7, 3.8, value_length*resolution/1000+1, -0.5], axis:true,defaultAxes: { x:{ name: 'Zeit [s]', withLabel: true, label:{ position: 'rt', offset: [-20, -20]}}, y:{ withLabel:true, name: 'Spannung [V]', label:{ position: 'rt',offset: [5, -15]}}}});
         var points = [];
         for (let i = 0; i<value_length;i++){
           if (i < 60){
@@ -202,6 +207,64 @@ const char WEBDATA[] PROGMEM = R"=====(
           }else if (i <300){
             points[i] = board.create('point',[i*resolution/1000,value4[i-240]*3.3/255],{withLabel:false, fixed:true});
           }
+        }
+        if (modus == 2){
+          var value_stellg_max = [];
+          value_stellg_max[0] = Math.max(...value_points_stellg);
+          value_stellg_max[1] = Math.max(...value_points_stellg1);
+          value_stellg_max[2] = Math.max(...value_points_stellg2);
+          value_stellg_max[3] = Math.max(...value_points_stellg3);
+          value_stellg_max[4] = Math.max(...value_points_stellg4);
+          var value_stellg_maximum = Math.max(...value_stellg_max);
+          
+          var checkbox = board.create('checkbox', [1.5, value_maximum*3.3/255+0.5, 'show/hide Regelgröße'], {});
+          var checkbox2 = board.create('checkbox', [4, value_maximum*3.3/255+0.5, 'show/hide Führungsgröße'], {});
+          
+          var axis2 = board.create('axis', [[value_length*resolution/1000, 0.0], [value_length*resolution/1000, value_stellg_maximum]], {withLabel:true, name: 'Stellgröße [V]', label:{ position: 'rt',offset: [-50, -15]},visible:false});
+          var points_stellg = [];
+          for (let i = 0; i<value_length;i++){
+            if (i < 60){
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg[i]*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+            }else if (i <120){
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg1[i-60]*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+            }else if (i <180){
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg2[i-120]*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+            }else if (i <240){
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg3[i-180]*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+            }else if (i <300){
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg4[i-240]*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+            }
+          }
+
+          var points_fuehrungsg = [];
+          for (let i = 0; i<value_length;i++){
+            points_fuehrungsg[i] = board.create('point',[i*resolution/1000,sollwert/1000],{withLabel:false, fixed:true,visible:false, fillColor: 'green'});
+          }
+          
+          JXG.addEvent(checkbox.rendNodeCheckbox, 'change', function() {
+            if (this.Value()) {
+              for (let i = 0; i<value_length;i++){
+                points_stellg[i].setAttribute({visible:true});
+                axis2.setAttribute({visible:true});
+              }
+            } else {
+              for (let i = 0; i<value_length;i++){
+                points_stellg[i].setAttribute({visible:false});
+                axis2.setAttribute({visible:false});
+              }
+            }
+          }, checkbox);
+          JXG.addEvent(checkbox2.rendNodeCheckbox, 'change', function() {
+            if (this.Value()) {
+              for (let i = 0; i<value_length;i++){
+                points_fuehrungsg[i].setAttribute({visible:true});
+              }
+            } else {
+              for (let i = 0; i<value_length;i++){
+                points_fuehrungsg[i].setAttribute({visible:false});
+              }
+            }
+          }, checkbox2);
         }
         
     }

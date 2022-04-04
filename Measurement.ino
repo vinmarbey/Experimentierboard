@@ -56,6 +56,7 @@ void handleMessung() {
   
   last_time = akt_time;
   akt_value = analogRead(A0) / 4.0;
+  //Serial.println(akt_value);
   Messdaten[zaehler_Messdaten] = (unsigned char) akt_value;
   zaehler_Messdaten ++;
   
@@ -66,6 +67,7 @@ void handleMessung() {
   if (reglerstruktur == 1){
     //P-Regler
     output_reg = gain/100.0 * error;
+    Stellgroesse[zaehler_Messdaten-1] = output_reg;
     
   }else if (reglerstruktur == 2){
     //PI-Regler
@@ -73,9 +75,11 @@ void handleMessung() {
     //output_reg = (error + (integrate_temp/(nachstellzeit/1000.0)));
     //output_reg = gain/100.0 * output_reg;
     output_reg = gain/100.0 * (integrate_temp/(nachstellzeit/1000.0));
+    Stellgroesse[zaehler_Messdaten-1] = output_reg;
     //output_reg = int(gain/100.0 * (error + (integrate_temp)));
   }
   analogWrite(MESSOBJEKT1, int(output_reg));
+  
   
   return;
 }

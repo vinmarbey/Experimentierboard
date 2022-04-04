@@ -31,7 +31,6 @@ void handleApiRequest() {
   deserializeJson(jsonDocument, server.arg("plain"));
 
   JsonObject root = jsonDocument.as<JsonObject>();
-  Serial.println(root);
   //char start_measurement = root["Start"];
   //char stop_measurement = root["Stop"];
   if (root["Start"] == 1) {
@@ -139,6 +138,66 @@ void handleData()
       for (int i = 0; i < number_of_elements % 60; i++) {
         doc["data"][i] = Messdaten[i];
       }
+    }
+
+    doc["data_stellg"][0] = 0;
+    doc["data_stellg1"][0] = 0;
+    doc["data_stellg2"][0] = 0;
+    doc["data_stellg3"][0] = 0;
+    doc["data_stellg4"][0] = 0;
+  
+    if (modus == 2){
+    if (number_of_elements >= 60) {
+      for (int i = 0; i < 60; i++) {
+        doc["data_stellg"][i] = Stellgroesse[i];
+      }
+      if (number_of_elements - 120 >= 0) {
+        for (int i = 0; i < 60; i++) {
+          doc["data_stellg1"][i] = Stellgroesse[i + 60];
+        }
+  
+        if (number_of_elements - 180 >= 0) {
+          for (int i = 0; i < 60; i++) {
+            doc["data_stellg2"][i] = Stellgroesse[i + 120];
+          }
+          if (number_of_elements - 240 >= 0) {
+            for (int i = 0; i < 60; i++) {
+              doc["data_stellg3"][i] = Stellgroesse[i + 180];
+            }
+            if (number_of_elements - 300 >= 0) {
+              for (int i = 0; i < 60; i++) {
+                doc["data_stellg4"][i] = Stellgroesse[i + 240];
+              }
+            }
+            else {
+              for (int i = 0; i < number_of_elements % 60; i++) {
+                doc["data_stellg4"][i] = Stellgroesse[i + 240];
+              }
+            }
+          }
+          else {
+            for (int i = 0; i < number_of_elements % 60; i++) {
+              doc["data_stellg3"][i] = Stellgroesse[i + 180];
+            }
+          }
+        }
+        else {
+          for (int i = 0; i < number_of_elements % 60; i++) {
+            doc["data_stellg2"][i] = Stellgroesse[i + 120];
+          }
+        }
+      }
+      else {
+        for (int i = 0; i < number_of_elements % 60; i++) {
+          doc["data_stellg1"][i] = Stellgroesse[i + 60];
+        }
+      }
+    }
+    else {
+      for (int i = 0; i < number_of_elements % 60; i++) {
+        doc["data_stellg"][i] = Stellgroesse[i];
+      }
+    }
     }
 
   //serializeJson(doc, Serial);
