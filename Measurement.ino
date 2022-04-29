@@ -56,7 +56,8 @@ void handleMessung() {
   
   last_time = akt_time;
   akt_value = analogRead(A0) / 4.0;
-  //Serial.println(akt_value);
+  if (akt_value>255&&akt_value<260) akt_value=255;
+  Serial.println(akt_value);
   Messdaten[zaehler_Messdaten] = (unsigned char) akt_value;
   zaehler_Messdaten ++;
   

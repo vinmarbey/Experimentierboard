@@ -68,11 +68,12 @@ void setup(void) {
   Serial.begin(115200);
 
   //WiFi.mode(WIFI_STA);
-  WiFi.mode(WIFI_AP_STA);
-  WiFi.hostname(deviceName);
-  WiFi.config(clientIP, gateway, subnet); // Remove for DHCP
+    //WiFi.mode(WIFI_AP_STA);
+  WiFi.mode(WIFI_AP);
+    //WiFi.hostname(deviceName);
+    //WiFi.config(clientIP, gateway, subnet); // Remove for DHCP
 
-  WiFi.begin(ssid, password);
+    //WiFi.begin(ssid, password);
   //Serial.print("start");
   WiFi.softAP(ap_ssid, ap_password);
 //  Serial.print("Access Point is Created with SSID: ");
@@ -85,10 +86,10 @@ void setup(void) {
   Serial.println("");
 
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
+//  while (WiFi.status() != WL_CONNECTED) {
+//    delay(500);
+//    Serial.print(".");
+//  }
   Serial.println("");
   Serial.print("Connected to ");
   Serial.println(ssid);
