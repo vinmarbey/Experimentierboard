@@ -92,7 +92,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
   
   <!-- Begin page content -->
   <main >
-            <h2>Controller</h2>
+            <h2>Parametrierung</h2>
             <form>
               <div class="form-group">
                 <p>Bitte wählen Sie den gewünschten Messmodus aus.</p>
@@ -145,7 +145,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
               </table>
               <button id="submitValues" type="button" class="btn" style="visibility:hidden">Start</button>
               <button id="stopMessung" type="button" class="btn" style="visibility:hidden">Stop</button>
-              <button id="gotosettings" type="button" class="btn"><a href="/data">go to data</a></button>
+              <a href="/data"><button id="gotosettings" type="button" class="btn">zur Datenseite</button></a>
               <p>Achtung: Erst nach Ablauf der Messzeit zur Datenseite wechseln! Wenn die Zeit abgelaufen ist, werden Sie informiert.</p>
               <h2 id="start_alert"></h2>
 

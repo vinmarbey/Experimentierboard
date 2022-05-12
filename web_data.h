@@ -91,12 +91,12 @@ const char WEBDATA[] PROGMEM = R"=====(
   
   <!-- Begin page content -->
   <main >
-            <h2>DATA</h2>
+            <h2>Datenseite</h2>
             <!-- <p>get data and handle it</p> -->
-            <button id="getData" type="button" class="btn">get and print measured data</button>
-            <button id="printData" type="button" onclick="printData()" class="btn">reprint data</button>
-            <button id="gotosettings" type="button" class="btn"><a href="/admin">go to settings</a></button>
-            <p></p><button id="animateData" type="button" onclick="Animation()" class="btn">Animation straten</button>
+            <button id="getData" type="button" class="btn">Anzeigen der Daten</button>
+            <!-- <button id="printData" type="button" onclick="printData()" class="btn">reprint data</button> -->
+            <a href="/admin"><button id="gotosettings" type="button" class="btn">zur Parametrierung</button></a>
+            <p></p><button id="animateData" type="button" onclick="Animation()" class="btn">Animation starten</button>
             <div id="capture">
             <p>Parameter der Messung:</p>
             <div id="datacontent"></div>
@@ -195,7 +195,7 @@ const char WEBDATA[] PROGMEM = R"=====(
         }
         //document.getElementById("datacontent").innerHTML = meas_values;
             
-        var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0, 3.8, value_length*resolution/1000, -0.5], axis:true,defaultAxes: { x:{ name: 'Zeit [s]', withLabel: true, label:{ position: 'rt', offset: [-20, -20]}}, y:{ withLabel:true, name: 'Spannung [V]', label:{ position: 'rt',offset: [5, -15]}}}});
+        var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-value_length*resolution*0.05/1000, 3.8, value_length*resolution/1000, -0.5], axis:true,defaultAxes: { x:{ name: 'Zeit [s]', withLabel: true, label:{ position: 'rt', offset: [-20, -20]}}, y:{ withLabel:true, name: 'Spannung [V]', label:{ position: 'rt',offset: [5, -15]}}}});
         //var points = [];
         for (let i = 0; i<value_length;i++){
           if (i < 60){
