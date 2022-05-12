@@ -41,13 +41,15 @@ void handleApiRequest() {
     if (modus == 1) {
       timerange = root["Zeit"];
       resolution = root["Aufloesung"];
-
+      resolution = resolution /100.0;
+      //Serial.println(resolution);
       server.send(200, "application/json", server.arg("plain"));
 
       starte_Messung(modus, timerange);
     } else if (modus == 2) {
       timerange = root["Zeit2"];
       resolution = root["Aufloesung2"];
+      resolution = resolution /100.0;
       reglerstruktur = root["Regelstruktur"];
       gain = root["Verstaerkung"];
       sollwert = root["Sollwert"];
@@ -72,11 +74,11 @@ void handleData()
   //DynamicJsonDocument doc(2048);
   DynamicJsonDocument doc(6144);
 
-  int number_of_elements = timerange / resolution;
+  int number_of_elements = timerange / (resolution);
 //  int number_of_schleifen = number_of_elements / 60;
 //  //doc["schleifen"] = number_of_schleifen;
 //  int rest_schleifen = number_of_elements % number_of_schleifen;
-  doc["resolution"] = resolution;
+  doc["resolution"] = resolution*100;
   doc["modus"] = modus;
   doc["zeit"] = timerange;
   if (modus == 2) {

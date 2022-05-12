@@ -143,7 +143,8 @@ const char WEBDATA[] PROGMEM = R"=====(
             value4 = obj.data4;
             //console.log(value);
             modus = obj.modus;
-            resolution = obj.resolution;
+            resolution = obj.resolution/100;
+            console.log(resolution);
             zeit = obj.zeit;
             if (modus == 2){
               regelstruktur = obj.Regelstruktur;

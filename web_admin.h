@@ -97,23 +97,24 @@ const char WEBADMIN[] PROGMEM = R"=====(
               <div class="form-group">
                 <p>Bitte wählen Sie den gewünschten Messmodus aus.</p>
                 <p>Ein erneuter Klick blendet die Parametrierung ein bzw. aus.</p>
+                <p>Es sind max. 256 Messpunkte möglich. Kommazahlen: 0.01</p>
                 <button id="Sprungantwort" type="button" class="btn" onclick="chooseSprungantwort()">Sprungantwort</button>
                 <button id="Regelung" type="button" class="btn" onclick="chooseRegelung()" >Regelung</button>
                 <p>gewählter Messmodus: <span id="choosedMode"></span></p>
               </div>
               <!--
-              <div class="form-group">
-                <p>Messobjekte: Hier sind die Objekte 1-5 auswählbar</p>
-                <label>Messobjekte</label>
-                <input id="inputGValue" type="number" min="1" max="5"  value="1">
-              </div>
-          -->
+                  <div class="form-group">
+                    <p>Messobjekte: Hier sind die Objekte 1-5 auswählbar</p>
+                    <label>Messobjekte</label>
+                    <input id="inputGValue" type="number" min="1" max="5"  value="1">
+                  </div>
+              -->
             <table>
               <div id="conficSprungantwort" class="form-group" style="display:none;">
                 
                   <label>Sprungantwort Messzeitraum [ms] </label>
                   <input id="MesszeitraumSprungantwort" placeholder="0" value="10000" onchange="check_number_elements_s()"><br>
-                  <label>Auflösung Messung [ms]</label>
+                  <label>Auflösung Messung [ms] (min. 0.01)</label>
                   <input id="MessaufloesungSprungantwort" placeholder="0" value="250" onchange="check_number_elements_s()">
                 
               </div>
@@ -132,13 +133,13 @@ const char WEBADMIN[] PROGMEM = R"=====(
                   </ul>
                   <label>Sollwert [mV] </label>
                   <input id="SollwertRegelung" placeholder="0" value="1000"><br>
-                  <label>Verstärkung </label>
+                  <label>Verstärkung (min. 0.01)</label>
                   <input id="VerstaerkungRegelung" placeholder="0" value="1"><br>
                   <label>Nachstellzeit [ms]</label>
                   <input id="NachstellzeitRegelung" placeholder="0" value="1000"><br>
                   <label>Regelung Messzeitraum [ms] </label>
                   <input id="MesszeitraumRegelung" placeholder="0" value="10000" onchange="check_number_elements_r()"><br>
-                  <label>Auflösung Messung [ms]</label>
+                  <label>Auflösung Messung [ms] (min. 0.01)</label>
                   <input id="MessaufloesungRegelung" placeholder="0" value="250" onchange="check_number_elements_r()">
                 </div>
               </div>
@@ -268,7 +269,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
     submitBtn.addEventListener("click",function(){
       
       var MesszeitraumS = parseInt(document.getElementById("MesszeitraumSprungantwort").value);
-      var MessaufloesungS = parseInt(document.getElementById("MessaufloesungSprungantwort").value);
+      var MessaufloesungS = parseInt(document.getElementById("MessaufloesungSprungantwort").value*100);
 
       var checked_piregler = document.getElementById("piregler").checked;
       if (checked_piregler == true){
@@ -279,7 +280,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
       var SollwertR = parseInt(document.getElementById("SollwertRegelung").value);
       var NachstellzeitR = parseInt(document.getElementById("NachstellzeitRegelung").value);
       var MesszeitraumR = parseInt(document.getElementById("MesszeitraumRegelung").value);
-      var MessaufloesungR = parseInt(document.getElementById("MessaufloesungRegelung").value);
+      var MessaufloesungR = parseInt(document.getElementById("MessaufloesungRegelung").value*100);
       
       if (Messmodus == 1){
           const myTimeout1 = setTimeout(myGreeting, MesszeitraumS);}
