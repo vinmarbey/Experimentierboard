@@ -40,9 +40,10 @@ void handleApiRequest() {
     modus = root["Modus"];
     if (modus == 1) {
       timerange = root["Zeit"];
+      Serial.println(timerange);
       resolution = root["Aufloesung"];
       resolution = resolution /100.0;
-      //Serial.println(resolution);
+      Serial.println(resolution);
       server.send(200, "application/json", server.arg("plain"));
 
       starte_Messung(modus, timerange);

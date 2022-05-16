@@ -211,6 +211,40 @@ const char WEBDATA[] PROGMEM = R"=====(
             points[i] = board.create('point',[i*resolution/1000,value4[i-240]*3.3/255],{withLabel:false, fixed:true});
           }
         }
+        var checkbox_iglied = board.create('checkbox', [value_length*resolution/1000*0.2, 3.5, 'I-Glied'], {});
+        
+        JXG.addEvent(checkbox_iglied.rendNodeCheckbox, 'change', function() {
+            if (this.Value()) {
+              for (let i = 0; i<value_length;i++){
+                points[i].moveTo([points[i].X(),3.3-points[i].Y()]);
+              }
+            } else {
+              for (let i = 0; i<value_length;i++){
+                points[i].moveTo([points[i].X(),3.3-points[i].Y()]);
+              }
+            }
+          }, checkbox_iglied);
+
+          var checkbox_gerade = board.create('checkbox', [value_length*resolution/1000*0.4, 3.5, 'Anzeigen Gerade'], {});
+          points_gerade1 = board.create('point',[0,0],{withLabel:true, fixed:false,visible:false, fillColor: 'black', strokeColor: 'black'});
+          points_gerade2 = board.create('point',[value_length*resolution/1000*0.3,3],{withLabel:true, fixed:false,visible:false, fillColor: 'black', strokeColor: 'black'});
+          line_gerade = board.create('line',[points_gerade1,points_gerade2],{visible:false, fillColor: 'black', strokeColor: 'black'});
+          JXG.addEvent(checkbox_gerade.rendNodeCheckbox, 'change', function() {
+            if (this.Value()) {
+              for (let i = 0; i<value_length;i++){
+                points_gerade1.setAttribute({visible:true});
+                points_gerade2.setAttribute({visible:true});
+                line_gerade.setAttribute({visible:true});
+              }
+            } else {
+              for (let i = 0; i<value_length;i++){
+                points_gerade1.setAttribute({visible:false});
+                points_gerade2.setAttribute({visible:false});
+                line_gerade.setAttribute({visible:false});
+              }
+            }
+          }, checkbox_gerade);
+          
         if (modus == 2){
           var value_stellg_max = [];
           value_stellg_max[0] = Math.max(...value_points_stellg);
@@ -220,29 +254,30 @@ const char WEBDATA[] PROGMEM = R"=====(
           value_stellg_max[4] = Math.max(...value_points_stellg4);
           var value_stellg_maximum = Math.max(...value_stellg_max);
           
-          var checkbox = board.create('checkbox', [1.5, 3.6, 'show/hide Regelgröße'], {});
-          var checkbox2 = board.create('checkbox', [1.5, 3.3, 'show/hide Führungsgröße'], {});
+          var checkbox = board.create('checkbox', [value_length*resolution/1000*0.2, 3, 'show/hide Regelgröße'], {});
+          var checkbox2 = board.create('checkbox', [value_length*resolution/1000*0.4, 3, 'show/hide Führungsgröße'], {});
           
           var axis2 = board.create('axis', [[value_length*resolution/1000, 0.0], [value_length*resolution/1000, value_stellg_maximum]], {withLabel:true, name: 'Stellgröße [V]', label:{ position: 'rt',offset: [-50, -15]},visible:false});
           var points_stellg = [];
           for (let i = 0; i<value_length;i++){
             if (i < 60){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg[i]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg[i]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue', strokeColor: 'blue'});
             }else if (i <120){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg1[i-60]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg1[i-60]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue', strokeColor: 'blue'});
             }else if (i <180){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg2[i-120]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg2[i-120]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue', strokeColor: 'blue'});
             }else if (i <240){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg3[i-180]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg3[i-180]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue', strokeColor: 'blue'});
             }else if (i <300){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg4[i-240]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg4[i-240]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue', strokeColor: 'blue'});
             }
           }
 
           var points_fuehrungsg = [];
           for (let i = 0; i<value_length;i++){
-            points_fuehrungsg[i] = board.create('point',[i*resolution/1000,sollwert/1000],{withLabel:false, fixed:true,visible:false, fillColor: 'green'});
+            points_fuehrungsg[i] = board.create('point',[i*resolution/1000,sollwert/1000],{withLabel:false, fixed:true,visible:false, fillColor: 'green', strokeColor: 'green'});
           }
+          
           
           JXG.addEvent(checkbox.rendNodeCheckbox, 'change', function() {
             if (this.Value()) {

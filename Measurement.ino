@@ -52,12 +52,12 @@ void handleMessung() {
   }
 
   delta_time = akt_time - last_time;
-  if (delta_time < resolution) return; // die Zeit zur nächsten mesung ist noch nicht dran
+  if (delta_time < resolution) return; // die Zeit zur nächsten mesung ist noch nicht ran
   
   last_time = akt_time;
   akt_value = analogRead(A0) / 4.0;
   if (akt_value>255&&akt_value<260) akt_value=255;
-  Serial.println(akt_value);
+  //Serial.println(akt_value);
   Messdaten[zaehler_Messdaten] = (unsigned char) akt_value;
   zaehler_Messdaten ++;
   
@@ -68,7 +68,9 @@ void handleMessung() {
   if (reglerstruktur == 1){
     //P-Regler
     output_reg = gain/100.0 * error;
+    if (output_reg > 255) output_reg=255;
     Stellgroesse[zaehler_Messdaten-1] = output_reg/4;
+    
     
   }else if (reglerstruktur == 2){
     //PI-Regler

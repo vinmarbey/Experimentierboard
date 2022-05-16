@@ -114,7 +114,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
                 
                   <label>Sprungantwort Messzeitraum [ms] </label>
                   <input id="MesszeitraumSprungantwort" placeholder="0" value="10000" onchange="check_number_elements_s()"><br>
-                  <label>Auflösung Messung [ms] (min. 0.01)</label>
+                  <label>Auflösung Messung [ms]</label>
                   <input id="MessaufloesungSprungantwort" placeholder="0" value="250" onchange="check_number_elements_s()">
                 
               </div>
@@ -132,14 +132,14 @@ const char WEBADMIN[] PROGMEM = R"=====(
                   <input type="radio" id="piregler" name="regler" value="2" >
                   </ul>
                   <label>Sollwert [mV] </label>
-                  <input id="SollwertRegelung" placeholder="0" value="1000"><br>
-                  <label>Verstärkung (min. 0.01)</label>
+                  <input id="SollwertRegelung" placeholder="0" value="1500"><br>
+                  <label>Verstärkung</label>
                   <input id="VerstaerkungRegelung" placeholder="0" value="1"><br>
                   <label>Nachstellzeit [ms]</label>
                   <input id="NachstellzeitRegelung" placeholder="0" value="1000"><br>
                   <label>Regelung Messzeitraum [ms] </label>
                   <input id="MesszeitraumRegelung" placeholder="0" value="10000" onchange="check_number_elements_r()"><br>
-                  <label>Auflösung Messung [ms] (min. 0.01)</label>
+                  <label>Auflösung Messung [ms]</label>
                   <input id="MessaufloesungRegelung" placeholder="0" value="250" onchange="check_number_elements_r()">
                 </div>
               </div>
