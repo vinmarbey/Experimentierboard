@@ -1,4 +1,4 @@
-const char WEBADMIN[] PROGMEM = R"=====(
+
 <!DOCTYPE html>
 <html lang="de">
   <head>
@@ -97,7 +97,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
               <div class="form-group">
                 <p>Bitte wählen Sie den gewünschten Messmodus aus.</p>
                 <p>Ein erneuter Klick blendet die Parametrierung ein bzw. aus.</p>
-                <p>Es sind max. 256 Messpunkte möglich. Kommazahlen: 0.1</p>
+                <p>Es sind max. 256 Messpunkte möglich. Kommazahlen: 0.01</p>
                 <button id="Sprungantwort" type="button" class="btn" onclick="chooseSprungantwort()">Sprungantwort</button>
                 <button id="Regelung" type="button" class="btn" onclick="chooseRegelung()" >Regelung</button>
                 <p>gewählter Messmodus: <span id="choosedMode"></span></p>
@@ -233,7 +233,7 @@ const char WEBADMIN[] PROGMEM = R"=====(
       });
 
       function myGreeting() {
-          document.getElementById("start_alert").innerHTML = "Messzeit vorbei. Wechseln Sie nun zur Datenseite"
+          document.getElementById("start_alert").innerHTML = "Messzeit vorbei. Wechseln Sie nun zur Datenseite";
       }
 
       function chooseSprungantwort() {
@@ -287,26 +287,17 @@ const char WEBADMIN[] PROGMEM = R"=====(
           const myTimeout1 = setTimeout(myGreeting, MesszeitraumS);
           var counter = 0;
           var restzeit = setInterval(
-            function(){
-              counter = counter + 1;
-              var Restzeit = MesszeitraumS-counter*MessaufloesungS/100;
-              if (Restzeit < 0) {clearInterval(restzeit);}
-              else{document.getElementById("restZeit").innerHTML = Restzeit;}
+          	function(){
+          		counter = counter + 1;
+          		var Restzeit = MesszeitraumS-counter*MessaufloesungS/100;
+          		if (Restzeit < 0) {clearInterval(restzeit);}
+          		else{document.getElementById("restZeit").innerHTML = Restzeit;}
 
-            }
-            , MessaufloesungS/100);}
+          	}
+          	, MessaufloesungS/100);
+          console.log(restzeit);}
       if (Messmodus == 2){
-          const myTimeout2 = setTimeout(myGreeting, MesszeitraumR);
-          var counterR = 0;
-          var restzeit = setInterval(
-            function(){
-              counterR = counterR + 1;
-              var Restzeit = MesszeitraumR-counterR*MessaufloesungR/100;
-              if (Restzeit < 0) {clearInterval(restzeit);}
-              else{document.getElementById("restZeit").innerHTML = Restzeit;}
-
-            }
-            , MessaufloesungS/100);}
+          const myTimeout2 = setTimeout(myGreeting, MesszeitraumR);}
           
       var json_start = {Start:1,Modus:Messmodus,Zeit:MesszeitraumS,Aufloesung:MessaufloesungS,Zeit2:MesszeitraumR,Aufloesung2:MessaufloesungR,Regelstruktur:Reglerstruktur,Sollwert:SollwertR,Nachstellzeit:NachstellzeitR,Verstaerkung:VerstaerkungR,auffuellen:35};
       console.log(json_start);
@@ -348,4 +339,3 @@ const char WEBADMIN[] PROGMEM = R"=====(
     </script>
   </body>
 </html>
-)=====";

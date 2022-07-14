@@ -1,4 +1,3 @@
-const char WEBDATA[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html lang="de">
   <head>
@@ -91,12 +90,12 @@ const char WEBDATA[] PROGMEM = R"=====(
   
   <!-- Begin page content -->
   <main >
-            <h2>Datenseite</h2>
+            <h2>DATA</h2>
             <!-- <p>get data and handle it</p> -->
-            <button id="getData" type="button" class="btn">Anzeigen der Daten</button>
-            <!-- <button id="printData" type="button" onclick="printData()" class="btn">reprint data</button> -->
-            <a href="/admin"><button id="gotosettings" type="button" class="btn">zur Parametrierung</button></a>
-            <p></p><button id="animateData" type="button" onclick="Animation()" class="btn">Animation starten</button>
+            <button id="getData" type="button" class="btn">get and print measured data</button>
+            <button id="printData" type="button" onclick="printData()" class="btn">reprint data</button>
+            <button id="gotosettings" type="button" class="btn"><a href="/admin">go to settings</a></button>
+            <p></p><button id="animateData" type="button" onclick="Animation()" class="btn">Animation straten</button>
             <div id="capture">
             <p>Parameter der Messung:</p>
             <div id="datacontent"></div>
@@ -143,8 +142,7 @@ const char WEBDATA[] PROGMEM = R"=====(
             value4 = obj.data4;
             //console.log(value);
             modus = obj.modus;
-            resolution = obj.resolution/100;
-            console.log(resolution);
+            resolution = obj.resolution;
             zeit = obj.zeit;
             if (modus == 2){
               regelstruktur = obj.Regelstruktur;
@@ -195,8 +193,10 @@ const char WEBDATA[] PROGMEM = R"=====(
           document.getElementById("parmeter").innerHTML = "Modus: " + "Sprungantwort" + "<br>Messzeitzeit: " + zeit + " ms<br>Aufloesung: " + resolution + " ms";
         }
         //document.getElementById("datacontent").innerHTML = meas_values;
+
+
             
-        var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-value_length*resolution*0.05/1000, 3.8, value_length*resolution/1000, -0.5], axis:true,defaultAxes: { x:{ name: 'Zeit [s]', withLabel: true, label:{ position: 'rt', offset: [-20, -20]}}, y:{ withLabel:true, name: 'Spannung [V]', label:{ position: 'rt',offset: [5, -15]}}}});
+        var board = JXG.JSXGraph.initBoard('box', {boundingbox: [-0, 3.8, value_length*resolution/1000, -0.5], axis:true,defaultAxes: { x:{ name: 'Zeit [s]', withLabel: true, label:{ position: 'rt', offset: [-20, -20]}}, y:{ withLabel:true, name: 'Spannung [V]', label:{ position: 'rt',offset: [5, -15]}}}});
         //var points = [];
         var resize = board.create('checkbox', [1.5, 3.6, 'resize'], {});
         for (let i = 0; i<value_length;i++){
@@ -212,40 +212,6 @@ const char WEBDATA[] PROGMEM = R"=====(
             points[i] = board.create('point',[i*resolution/1000,value4[i-240]*3.3/255],{withLabel:false, fixed:true});
           }
         }
-        var checkbox_iglied = board.create('checkbox', [value_length*resolution/1000*0.2, 3.5, 'I-Glied'], {});
-        
-        JXG.addEvent(checkbox_iglied.rendNodeCheckbox, 'change', function() {
-            if (this.Value()) {
-              for (let i = 0; i<value_length;i++){
-                points[i].moveTo([points[i].X(),3.3-points[i].Y()]);
-              }
-            } else {
-              for (let i = 0; i<value_length;i++){
-                points[i].moveTo([points[i].X(),3.3-points[i].Y()]);
-              }
-            }
-          }, checkbox_iglied);
-
-          var checkbox_gerade = board.create('checkbox', [value_length*resolution/1000*0.4, 3.5, 'Anzeigen Gerade'], {});
-          points_gerade1 = board.create('point',[0,0],{withLabel:true, fixed:false,visible:false, fillColor: 'black', strokeColor: 'black'});
-          points_gerade2 = board.create('point',[value_length*resolution/1000*0.3,3],{withLabel:true, fixed:false,visible:false, fillColor: 'black', strokeColor: 'black'});
-          line_gerade = board.create('line',[points_gerade1,points_gerade2],{visible:false, fillColor: 'black', strokeColor: 'black'});
-          JXG.addEvent(checkbox_gerade.rendNodeCheckbox, 'change', function() {
-            if (this.Value()) {
-              for (let i = 0; i<value_length;i++){
-                points_gerade1.setAttribute({visible:true});
-                points_gerade2.setAttribute({visible:true});
-                line_gerade.setAttribute({visible:true});
-              }
-            } else {
-              for (let i = 0; i<value_length;i++){
-                points_gerade1.setAttribute({visible:false});
-                points_gerade2.setAttribute({visible:false});
-                line_gerade.setAttribute({visible:false});
-              }
-            }
-          }, checkbox_gerade);
-          
         if (modus == 2){
           var value_stellg_max = [];
           value_stellg_max[0] = Math.max(...value_points_stellg);
@@ -255,30 +221,30 @@ const char WEBDATA[] PROGMEM = R"=====(
           value_stellg_max[4] = Math.max(...value_points_stellg4);
           var value_stellg_maximum = Math.max(...value_stellg_max);
           
-          var checkbox = board.create('checkbox', [value_length*resolution/1000*0.2, 3, 'show/hide Regelgröße'], {});
-          var checkbox2 = board.create('checkbox', [value_length*resolution/1000*0.4, 3, 'show/hide Führungsgröße'], {});
+          var checkbox = board.create('checkbox', [1.5, 3.6, 'show/hide Regelgröße'], {});
+          var checkbox2 = board.create('checkbox', [1.5, 3.3, 'show/hide Führungsgröße'], {});
+
           
           var axis2 = board.create('axis', [[value_length*resolution/1000, 0.0], [value_length*resolution/1000, value_stellg_maximum]], {withLabel:true, name: 'Stellgröße [V]', label:{ position: 'rt',offset: [-50, -15]},visible:false});
           var points_stellg = [];
           for (let i = 0; i<value_length;i++){
             if (i < 60){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg[i]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue', strokeColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg[i]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
             }else if (i <120){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg1[i-60]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue', strokeColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg1[i-60]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
             }else if (i <180){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg2[i-120]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue', strokeColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg2[i-120]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
             }else if (i <240){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg3[i-180]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue', strokeColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg3[i-180]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
             }else if (i <300){
-              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg4[i-240]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue', strokeColor: 'blue'});
+              points_stellg[i] = board.create('point',[i*resolution/1000,value_points_stellg4[i-240]*4*3.3/255],{withLabel:false, fixed:true,visible:false, fillColor: 'blue'});
             }
           }
 
           var points_fuehrungsg = [];
           for (let i = 0; i<value_length;i++){
-            points_fuehrungsg[i] = board.create('point',[i*resolution/1000,sollwert/1000],{withLabel:false, fixed:true,visible:false, fillColor: 'green', strokeColor: 'green'});
+            points_fuehrungsg[i] = board.create('point',[i*resolution/1000,sollwert/1000],{withLabel:false, fixed:true,visible:false, fillColor: 'green'});
           }
-          
           
           JXG.addEvent(checkbox.rendNodeCheckbox, 'change', function() {
             if (this.Value()) {
@@ -305,16 +271,17 @@ const char WEBDATA[] PROGMEM = R"=====(
             }
           }, checkbox2);
         }
+
         var resize_checkbox = board.create('checkbox', [value_length*resolution*0.05/1000, -0.3, 'resize'], {visible:true});
         var resize_slider = board.create('slider', [[2*value_length*resolution*0.05/1000, -0.3], [value_length*resolution*0.3/1000, -0.3], [value_length*resolution*0.1/1000*1000, value_length*resolution/1000*1000, value_length*resolution/1000*1000]],{suffixLabel: 'max. t = ',  postLabel: ' ms'});
         JXG.addEvent(resize_checkbox.rendNodeCheckbox, 'change', function() {
             if (this.Value()) {
-              board.setBoundingBox([-value_length*resolution*0.05/1000, 3.8, resize_slider.Value()/1000, -0.5])
-      
+              board.setBoundingBox([-0.7, example_value_max+0.7, resize_slider.Value()/1000, -0.5])
             } else {
-                board.setBoundingBox([-value_length*resolution*0.05/1000, 3.8, value_length*resolution/1000, -0.5])
+                board.setBoundingBox([-0.7, example_value_max+0.7, example_value_length*example_resolution/1000+1, -0.5])
             }
           }, resize_checkbox);
+        
     }
 
     function Animation() {
@@ -426,4 +393,3 @@ const char WEBDATA[] PROGMEM = R"=====(
     </script>
   </body>
 </html>
-)=====";

@@ -41,9 +41,10 @@ int control_messzeitspanne, timerange;
 int gain=100,sollwert=2000,nachstellzeit=5000;
 unsigned long start_zeitpunkt = 0;
 
-unsigned long akt_time, delta_time, last_time = 0;
+unsigned long akt_time,delta_time, last_time = 0;
+//float akt_time, start_zeitpunkt=0;
 int akt_value;
-int error, integrate_temp;
+float error, integrate_temp;
 float output_reg, resolution;
 
 

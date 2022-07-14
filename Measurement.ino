@@ -23,8 +23,11 @@ void starte_Messung(char modus, int timerange) {
   control_messung |= (1 << start_messung);
   digitalWrite(Status_LED, HIGH); //LED Anzeige für Messung an
   
-  start_zeitpunkt = millis();
+  //start_zeitpunkt = millis();
+  start_zeitpunkt = micros();
+  
   Serial.println("Starte Messung");
+  Serial.println(start_zeitpunkt);
   
   return;
 }
@@ -43,9 +46,12 @@ void handleMessung() {
 
   if (!(control_messung & (1 << start_messung))) return; // soll überhaupt gerade gemessen werden
   
-  akt_time = millis() - start_zeitpunkt;
+  //akt_time = millis() - start_zeitpunkt;
+  akt_time = micros() - start_zeitpunkt;
   
-  if (akt_time > control_messzeitspanne) { // Messzeit ist größer als Messzeitraum
+  if (akt_time > control_messzeitspanne*1000) { // Messzeit ist größer als Messzeitraum
+    Serial.println(akt_time);
+    Serial.println(control_messzeitspanne);
     stoppe_Messung();
     Serial.println("Stoppe Messung");
     return;
@@ -53,6 +59,7 @@ void handleMessung() {
 
   delta_time = akt_time - last_time;
   if (delta_time < resolution) return; // die Zeit zur nächsten mesung ist noch nicht ran
+  //Serial.println(delta_time);
   
   last_time = akt_time;
   akt_value = analogRead(A0) / 4.0;
@@ -76,9 +83,9 @@ void handleMessung() {
     //PI-Regler
     integrate_temp += error * resolution/1000.0;
     output_reg = gain/100.0 * (error + (integrate_temp/(nachstellzeit/1000.0)));
-//    Serial.println(error);
-//    Serial.println(integrate_temp);
-//    Serial.println(output_reg);
+    //Serial.println(error);
+    //Serial.println(integrate_temp);
+    //Serial.println(output_reg);
     //output_reg = gain/100.0 * output_reg;
     //output_reg = gain/100.0 * (integrate_temp/(nachstellzeit/1000.0));
     if (output_reg > 255) output_reg=255;
