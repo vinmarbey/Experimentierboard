@@ -53,7 +53,7 @@ void handleMessung() {
 
   delta_time = akt_time - last_time;
   if (delta_time < resolution) return; // die Zeit zur nächsten mesung ist noch nicht ran
-  
+  Serial.println("Messpunkt");
   last_time = akt_time;
   akt_value = analogRead(A0) / 4.0;
   if (akt_value>255&&akt_value<260) akt_value=255;
